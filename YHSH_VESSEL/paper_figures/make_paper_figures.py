@@ -405,45 +405,64 @@ def fig7():
 # ══════════════════════════════════════════════════════════════════════════
 # Fig.8 — Global A* + local cooperative policy   (재평가 대기)
 # ══════════════════════════════════════════════════════════════════════════
+SRC_FIG8 = 'Fig8_지도&DT(예정).pdf.png'
+# 원본 3309x2062 에서 세 번째 칸('placeholder' 블록)이 차지하는 픽셀 상자 (실측).
+PLACEHOLDER_BOX = (1650, 1128, 3300, 1995)
+
+
 def fig8():
-    fig = plt.figure(figsize=(10.4, 6.6))
-    gs = GridSpec(2, 2, figure=fig, hspace=0.30, wspace=0.24)
+    """기존 `Fig8_지도&DT(예정)` 을 되살린 구성.
 
-    ax = fig.add_subplot(gs[0, 0])
-    fsx.embed_png(ax, os.path.join(ROOT, 'Fig8_A_', 'Fig8_korea_taiwan.png'))
-    ax.set_title('Real-coastline global A* route  (Busan–Taiwan)', pad=6)
-    fsx.panel_tag(ax, '(a)', dx=-0.01)
+    그 그림은 (a) 실해안선 A* 경로 → 확대 콜아웃 → (b) 회랑 항적 으로 실제 해역과
+    시뮬레이터를 잇는다. 계획서가 integration figure 에 요구한 (a)(b) 를 이미 만족하고,
+    특히 (a) 의 빨간 콜아웃이 두 패널을 물리적으로 연결한다 — 잘라 내면 그 연결이
+    끊기므로 원본을 통째로 쓰고 세 번째 칸만 교체한다.
 
-    pend = [('(b)', gs[0, 1], 'Simulator route example',
-             'One obstructed spawn–goal pair:\ndirect line · A* waypoints · obstacles\n'
-             '· inflated boundary · goal'),
-            ('(c)', gs[1, 0], 'Collision rate',
-             '4 conditions × {all 320, blocked 148}\nDirect/A*  ×  Comm OFF/ON'),
-            ('(d)', gs[1, 1], 'Arrival rate',
-             '4 conditions × {all 320, blocked 148}\nDirect/A*  ×  Comm OFF/ON')]
-    for tag, cell, title, body in pend:
-        ax = fig.add_subplot(cell)
-        ax.set_xticks([]); ax.set_yticks([])
-        ax.grid(False)
-        for s in ax.spines.values():
-            s.set_visible(True); s.set_linestyle((0, (4, 4))); s.set_color('#c2c8ce')
-        ax.text(0.5, 0.60, body, ha='center', va='center', transform=ax.transAxes,
-                fontsize=8.6, color=C['mute'], linespacing=1.6)
-        ax.text(0.5, 0.24, 'pending re-evaluation', ha='center', va='center',
-                transform=ax.transAxes, fontsize=9.4, color='#8d3b3b',
-                fontweight='bold')
-        ax.set_title(title, pad=6)
-        fsx.panel_tag(ax, tag)
+    항적 데이터(corridor_traj)가 저장소에 없어 (b) 는 다시 그릴 수 없다.
+    정량 패널은 재평가 뒤 (c) 자리에 넣으면 된다.
+    """
+    src = os.path.join(ROOT, 'Fig8_A_', SRC_FIG8)
+    if not os.path.exists(src):
+        print(f'  Fig8 건너뜀 — {SRC_FIG8} 없음')
+        return
+    from PIL import Image, ImageDraw
+    im = Image.open(src).convert('RGB')
+    W, H = im.size
+    ImageDraw.Draw(im).rectangle(PLACEHOLDER_BOX, fill=(0, 0, 0))   # 자리표시자 지움
 
-    fig.text(0.5, 0.015,
-             'Panel (a) is a coastline occupancy map built from Natural Earth polygons — '
-             'it is not an AIS traffic digital twin.\n'
-             'Panels (b)–(d) await the rerun specified in the reorganization plan: '
-             'proposed checkpoint (qd_MOE_SE), ring = 0.7, direct vs A*, communication OFF vs ON,\n'
-             'reporting all 320 spawn–goal pairs and the 148 blocked pairs separately.  '
-             '172 / 320 pairs have a clear direct line, so A* and direct coincide there.\n'
-             'This is zero-shot waypoint integration: the policy was trained on direct goals '
-             'and was not retrained for waypoint following.',
+    fig = plt.figure(figsize=(11.6, 7.8), facecolor='white')
+    ax = fig.add_axes([0.0, 0.10, 1.0, 0.90])
+    ax.imshow(im)
+    ax.set_axis_off()
+
+    # 지운 자리에 (c) 예정 패널을 같은 위치로 올린다 (검은 배경에 맞춘 색).
+    x0, y0, x1, y1 = PLACEHOLDER_BOX
+    pad = 40
+    axC = ax.inset_axes([(x0 + pad) / W, 1 - (y1 - pad) / H,
+                         (x1 - x0 - 2 * pad) / W, (y1 - y0 - 2 * pad) / H])
+    axC.set_facecolor('none')
+    axC.set_xticks([]); axC.set_yticks([]); axC.grid(False)
+    for sp in axC.spines.values():
+        sp.set_visible(True); sp.set_linestyle((0, (5, 5)))
+        sp.set_color('#7d8a97'); sp.set_linewidth(1.1)
+    axC.text(0.5, 0.74, '(c)  Collision and arrival rate', ha='center', va='center',
+             transform=axC.transAxes, fontsize=11, color='#e8edf2')
+    axC.text(0.5, 0.50, 'Direct vs A*  x  Comm OFF / ON\nall 320 pairs   ·   blocked 148 pairs',
+             ha='center', va='center', transform=axC.transAxes, fontsize=9.2,
+             color='#aab6c2', linespacing=1.7)
+    axC.text(0.5, 0.24, 'pending re-evaluation', ha='center', va='center',
+             transform=axC.transAxes, fontsize=10, color='#e0a3a3', fontweight='bold')
+
+    fig.text(0.5, 0.005,
+             'Panels (a) and (b) are the existing Fig8 composition; the callout in (a) marks the '
+             'corridor whose tracks are shown in (b).  (a) is a coastline occupancy map built from\n'
+             'Natural Earth polygons, not an AIS traffic digital twin.  Panel (c) awaits the rerun '
+             'specified in the reorganization plan: proposed checkpoint (qd_MOE_SE), ring = 0.7, '
+             'direct vs A*,\ncommunication OFF vs ON, reporting all 320 spawn-goal pairs and the 148 '
+             'blocked pairs separately (172 / 320 already have a clear direct line).  '
+             'The corridor tracks in (b)\ncome from checkpoint ql_SE_START_s42, not the proposed '
+             'qd_MOE_SE.  This is zero-shot waypoint integration: the policy was trained on direct '
+             'goals, not retrained for waypoints.',
              ha='center', fontsize=8.0, color=C['mute'])
     fsx.save(fig, OUT, 'Fig8_Astar_integration')
 
