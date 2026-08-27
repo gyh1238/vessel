@@ -46,13 +46,17 @@ def fig1():
     lab = ['Comm OFF', 'Comm ON']
     col = [C['base'], C['proposed']]
 
-    fig = plt.figure(figsize=(12.2, 6.4))
-    gs = GridSpec(2, 3, figure=fig, hspace=0.46, wspace=0.32)
+    # 학습곡선은 넣지 않는다. 막대는 고정정책 완주 평가값이고 곡선은 학습 로그를 다시
+    # 계산한 값이라 추정량이 다르다 — 한 그림에 섞으면 같은 수치처럼 읽힌다.
+    fig = plt.figure(figsize=(11.0, 6.2))
+    gs = GridSpec(2, 3, figure=fig, hspace=0.48, wspace=0.34)
 
     ax = fig.add_subplot(gs[0, 0])
-    fsx.embed_png(ax, os.path.join(ROOT, 'Fig1_Communication', '0_reward_curve.png'))
-    ax.set_title('Learning outcome score', pad=6)
-    fsx.panel_tag(ax, '(a)', dx=-0.02, dy=1.01)
+    fsx.bars(ax, lab, [off['coll'], on['coll']], col, '{:.2f}',
+             ylabel='Collision rate (%)', title='Collision rate')
+    ax.annotate('-34%', xy=(1, on['coll']), xytext=(0, 22), textcoords='offset points',
+                ha='center', fontsize=9, color=C['accent'], fontweight='bold')
+    fsx.panel_tag(ax, '(a)', dx=-0.14)
 
     ax = fig.add_subplot(gs[0, 1])
     fsx.bars(ax, lab, [off['arrival'], on['arrival']], col, '{:.1f}',
@@ -60,33 +64,26 @@ def fig1():
     fsx.panel_tag(ax, '(b)', dx=-0.14)
 
     ax = fig.add_subplot(gs[0, 2])
-    fsx.bars(ax, lab, [off['coll'], on['coll']], col, '{:.2f}',
-             ylabel='Collision rate (%)', title='Collision rate')
-    ax.annotate('-34%', xy=(1, on['coll']), xytext=(0, 22), textcoords='offset points',
-                ha='center', fontsize=9, color=C['accent'], fontweight='bold')
-    fsx.panel_tag(ax, '(c)', dx=-0.14)
-
-    ax = fig.add_subplot(gs[1, 0])
     fsx.bars(ax, lab, [off['colregs'], on['colregs']], col, '{:.1f}',
              ylabel='Compliance (%)', title='Overall COLREGs compliance')
-    fsx.panel_tag(ax, '(d)', dx=-0.14)
+    fsx.panel_tag(ax, '(c)', dx=-0.14)
 
-    ax = fig.add_subplot(gs[1, 1])
+    ax = fig.add_subplot(gs[1, :2])
     fsx.grouped_bars(ax, SIT4, [('Comm OFF', sit_off), ('Comm ON', sit_on)], col,
-                     ylabel='Compliance (%)', title='Compliance by encounter type',
+                     ylabel='Compliance (%)', title='COLREGs compliance by encounter type',
                      fmt='{:.0f}')
     ax.set_ylim(0, 132)
-    ax.tick_params(axis='x', labelsize=7.6)
-    fsx.panel_tag(ax, '(e)', dx=-0.14)
+    fsx.panel_tag(ax, '(d)', dx=-0.07)
 
     ax = fig.add_subplot(gs[1, 2])
     fsx.rel_change(ax, ['Fuel', 'Heading\ntravel'], [off['fuel'], off['head']],
                    [on['fuel'], on['head']], title='Efficiency vs Comm OFF')
-    fsx.panel_tag(ax, '(f)', dx=-0.14)
+    fsx.panel_tag(ax, '(e)', dx=-0.14)
 
     fig.text(0.5, -0.035,
+             'All values are fixed-policy full-run evaluations, three seeds per arm.  '
              'Minimum separation and episode length are reported in the text.  '
-             'Per-seed values are unavailable, so no seed dots or error bars are drawn.\n'
+             'Per-seed values are unavailable, so no seed dots are drawn.\n'
              'Communication mainly improves safety and coordination in interaction-dependent '
              'crossing encounters rather than simply increasing arrival rate.',
              ha='center', fontsize=8.0, color=C['mute'])
@@ -278,35 +275,39 @@ def fig6():
     lab = ['From start\n(0M)', 'Delayed\n(9M)']
     col = [C['base'], C['proposed']]
 
-    fig = plt.figure(figsize=(10.4, 6.3))
-    gs = GridSpec(2, 2, figure=fig, hspace=0.42, wspace=0.28)
+    # 학습곡선 없음 — Fig1 과 같은 이유(추정량이 다름). 통신 투입 시점 자체는 x축 라벨과
+    # 캡션이 전달하고, 그림은 결과 비교만 한다.
+    fig = plt.figure(figsize=(10.6, 3.9))
+    gs = GridSpec(1, 3, figure=fig, wspace=0.36)
 
-    ax = fig.add_subplot(gs[0, :])
-    fsx.embed_png(ax, os.path.join(ROOT, 'Fig6_Comm_Timing', '0_reward_curve.png'))
-    ax.set_title('Learning curves — communication switched on at 0M vs 9M', pad=6)
-    fsx.panel_tag(ax, '(a)', dx=-0.005)
-
-    ax = fig.add_subplot(gs[1, 0])
+    ax = fig.add_subplot(gs[0, 0])
     fsx.bars(ax, lab, [6.53, 1.83], col, '{:.2f}',
              ylabel='Collision rate (%)', title='Collision rate')
     ax.tick_params(axis='x', labelsize=8.4)
-    fsx.panel_tag(ax, '(b)')
+    fsx.panel_tag(ax, '(a)', dx=-0.16)
 
-    ax = fig.add_subplot(gs[1, 1])
+    ax = fig.add_subplot(gs[0, 1])
+    fsx.bars(ax, lab, [46.4, 52.3], col, '{:.1f}',
+             ylabel='Compliance (%)', title='Overall COLREGs compliance')
+    ax.tick_params(axis='x', labelsize=8.4)
+    fsx.panel_tag(ax, '(b)', dx=-0.16)
+
+    ax = fig.add_subplot(gs[0, 2])
     fsx.bars(ax, lab, [61.3, 55.6], col, '{:.1f}', err=[14.5, 1.4],
              ylabel='Arrival rate (%)',
              title='Arrival rate — mean ± seed spread')
     ax.tick_params(axis='x', labelsize=8.4)
-    ax.annotate('±14.5', xy=(0, 61.3 + 14.5), xytext=(16, 0),
+    ax.annotate('±14.5', xy=(0, 61.3 + 14.5), xytext=(15, 0),
                 textcoords='offset points', fontsize=8.0, color='#8d3b3b', va='center')
-    ax.annotate('±1.4', xy=(1, 55.6 + 1.4), xytext=(16, 0),
+    ax.annotate('±1.4', xy=(1, 55.6 + 1.4), xytext=(15, 0),
                 textcoords='offset points', fontsize=8.0, color=C['accent'], va='center')
-    fsx.panel_tag(ax, '(c)')
+    fsx.panel_tag(ax, '(c)', dx=-0.16)
 
-    fig.text(0.5, -0.03,
-             'Overall COLREGs compliance 46.4% → 52.3% (delayed wins on all three seeds).  '
+    fig.text(0.5, -0.11,
+             'Both arms train for the full 16M decisions; the only difference is when messages '
+             'start flowing.  Delayed wins collision and compliance on all three seeds.\n'
              'Arrival mean favours from-start, but its seed spread is ten times larger — one seed '
-             'converged to a\nrushing policy (timeout 15.6%, collisions ×3.7).  '
+             'converged to a rushing policy (timeout 15.6%, collisions x3.7).\n'
              'Establishing a stable local control policy before coupling agents through learned '
              'communication produces a safer, far less seed-sensitive solution.',
              ha='center', fontsize=8.0, color=C['mute'])
