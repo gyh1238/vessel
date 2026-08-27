@@ -48,7 +48,7 @@
 {\color{violet}
 Cooperative navigation among Maritime Autonomous Surface Ships (MASS) is difficult in partially observable maritime environments because each vessel must make collision-avoidance decisions from incomplete local information while simultaneously satisfying encounter-dependent COLREGs obligations. This paper develops a communication-enabled cooperative navigation framework based on a simple design principle: information that is common across encounter types is shared, behavior that differs across COLREGs obligations is specialized, and information missing from local sensing is exchanged among vessels. Each vessel encodes its local observation into a compact latent message. At the receiver, the message is combined with relative bearing and distance before multi-neighbor aggregation so that learned semantic information remains associated with its physical origin. A COLREGs-conditioned Mixture-of-Experts (MoE) shares the radar perception module across encounter experts while retaining situation-specific decision cores. Communication is introduced after an initial local-navigation stage, and an auxiliary threat-decoding objective encourages transmitted messages to preserve collision-relevant information observed by the sender.
 
-The framework is evaluated in a GPU-batched maritime simulator with 16 simultaneously navigating vessels. Controlled experiments separately examine the necessity of communication, shared-perception expert design, multi-neighbor aggregation, message dimensionality, directional COLREGs shaping, and communication-introduction timing. Communication reduces collision rate while improving COLREGs compliance and navigation efficiency. The shared-perception MoE provides a favorable safety--model-size tradeoff relative to a single network and fully separated experts, and aggregating several spatially grounded messages is substantially safer than using only the nearest neighbor. Additional experiments examine heterogeneous communication capability and integration with an external A* route planner. The results show that communication-enabled distributed intelligence can improve cooperative MASS navigation while retaining decentralized execution.
+The framework is evaluated in a GPU-batched maritime simulator with 16 simultaneously navigating vessels. Controlled experiments separately examine the necessity of communication, shared-perception expert design, multi-neighbor aggregation, message dimensionality, directional COLREGs shaping, and communication-introduction timing. Communication reduces collision rate while improving COLREGs compliance and navigation efficiency. The shared-perception MoE provides a favorable safety--model-size tradeoff relative to a single network and fully separated experts, and aggregating several spatially grounded messages is substantially safer than using only the nearest neighbor. Fleet-size, representative-trajectory, and latent-message analyses further examine how the learned cooperation behaves as traffic density changes and how information is represented in the communication channel. Additional experiments examine heterogeneous communication capability and integration with an external A* route planner. The results show that communication-enabled distributed intelligence can improve cooperative MASS navigation while retaining decentralized execution.
 }
 \end{abstract}
 
@@ -80,10 +80,10 @@ The main contributions are summarized as follows:
 
     \item \textbf{Communication learning with explicit credit assignment:} partner observations are retained in the rollout buffer and partner messages are regenerated during PPO updates, allowing the receiver's control loss to train the sender's MessageActor. A threat-decoding auxiliary objective provides an additional representation-learning signal.
 
-    \item \textbf{Component-wise experimental validation:} the experiments ask one design question at a time---whether communication is useful, where expert specialization should occur, how many neighbors should be aggregated, how wide the message channel should be, how COLREGs knowledge should be injected, and when communication should be introduced during training.
+    \item \textbf{Component-wise and behavior-level validation:} controlled ablations isolate communication, expert sharing, neighbor aggregation, message width, COLREGs shaping, and communication timing. Additional fleet-size, trajectory, and latent-space analyses examine whether the cooperative behavior remains effective as interaction density changes and what information is retained by the learned communication channel.
 \end{itemize}
 
-The remainder of this paper is organized as follows. Section~2 introduces the vessel model and COLREGs background. Section~3 reviews path planning and cooperative MASS navigation. Section~4 presents the proposed framework. Section~5 describes the simulator and evaluation protocol. Section~6 presents the experimental results, including the eight component-wise and system-integration studies. Section~7 concludes the paper.
+The remainder of this paper is organized as follows. Section~2 introduces the vessel model and COLREGs background. Section~3 reviews path planning and cooperative MASS navigation. Section~4 presents the proposed framework. Section~5 describes the simulator and evaluation protocol. Section~6 presents the component-wise experiments together with scalability, behavioral, communication-space, heterogeneous-fleet, and route-planning analyses. Section~7 concludes the paper.
 }
 
 % =====================================================================
@@ -161,7 +161,7 @@ The proposed algorithm separates three roles that are often mixed together in co
     \caption{Overall cooperative-navigation framework. Each vessel forms a local observation, determines the active COLREGs context, generates a compact message for neighboring vessels, aggregates received information, and produces continuous navigation controls. The final implementation uses deterministic COLREGs hard routing and the shared-perception MoE described in Section~\ref{sec:shared_moe}.}
     \label{fig:framework_structure}
 \end{figure*}
-% TODO(FIGURE-LABEL): if the existing artwork still shows a learned/fuzzy gate or old dimensions, update only those labels; retain the reusable layout.
+% TODO(FIGURE-LABEL): retain the reusable artwork, but update any old learned/fuzzy-gate or dimension labels before submission.
 
 {\color{red}
 Consider $N$ vessels indexed by $i\in\{1,\ldots,N\}$. Each vessel executes the same parameter-shared policy and acts from its local observation and messages received from nearby vessels. The execution architecture consists of a MessageActor $M_{\theta_M}$, a ControlActor $\pi_{\theta_C}$, and a Critic $V_{\theta_V}$ used during PPO training. Fig.~\ref{fig:framework_structure} shows the information flow.
@@ -228,7 +228,7 @@ The reason for sharing perception is also practical. Across the MessageActor, Co
     \caption{Message-passing architecture. A transmitting vessel generates a compact latent message from its local features. At the receiver, sender-relative geometry is attached before the messages are combined and supplied to the ControlActor. The implemented aggregation is the position-grounded masked mean in Eq.~\eqref{eq:message_aggregation}.}
     \label{fig:message_architecture}
 \end{figure*}
-% TODO(FIGURE-LABEL): retain the existing flow diagram, but replace any old "sum" label by position-grounded masked mean and update old observation dimensions if still present.
+% TODO(FIGURE-LABEL): retain the existing flow diagram, but replace any old sum label by position-grounded masked mean and update old observation dimensions if still present.
 
 {\color{red}
 The MessageActor converts the local feature into a six-dimensional latent vector,
@@ -271,7 +271,7 @@ and a masked $L_1$ loss is applied only to valid threat slots. The reported expe
 \subsection{Reward and PPO Training}
 \label{sec:training}
 {\color{red}
-The reported Fig.~\ref{fig:comm_necessity}--Fig.~\ref{fig:comm_timing} checkpoints use the same Standard reward generation. Rather than treating the reward as one long analytical expression, it is useful to view it as four groups:
+The reported primary checkpoints use the same Standard reward generation. Rather than treating the reward as one long analytical expression, it is useful to view it as four groups:
 \begin{equation}
 R_i=R_i^{\mathrm{task}}+R_i^{\mathrm{safety}}+R_i^{\mathrm{eff}}+R_i^{\mathrm{COLREGs}}.
 \label{eq:reward_groups}
@@ -296,7 +296,7 @@ Radar range is 56~m, communication range is 420~m, and at most four communicatio
 
 \begin{table}[!t]
 \centering
-\caption{Common configuration for the principal Fig.~\ref{fig:comm_necessity}--Fig.~\ref{fig:comm_timing} experiments.}
+\caption{Common configuration for the principal component-wise experiments.}
 \label{tab:common_config}
 \small
 \setlength{\tabcolsep}{3pt}
@@ -331,6 +331,8 @@ J=1.5P_{\mathrm{arrival}}-6P_{\mathrm{collision}}-0.5P_{\mathrm{timeout}}.
 \label{eq:outcome_score}
 \end{equation}
 This score is used only as a compact outcome summary and not as the training reward.
+
+The additional scalability, trajectory, and message-space analyses are intended to be regenerated from the same proposed and communication-OFF checkpoint families before submission. The existing figures are retained in this draft to preserve the manuscript structure and the corresponding scientific discussion. Their final numerical annotations will be replaced by results obtained with the common 56~m radar range, 420~m communication range, ring factor 0.7, six-dimensional message, and the current shared-perception architecture.
 }
 
 % =====================================================================
@@ -338,7 +340,7 @@ This score is used only as a compact outcome summary and not as the training rew
 \label{sec:results}
 % =====================================================================
 {\color{red}
-The experiments are ordered as design questions rather than as a repeated list of metrics. The first six figures progressively test the communication and policy architecture. The last two figures examine robustness to heterogeneous communication and compatibility with route-level planning.
+The experiments are organized around progressively broader questions. The first six composite figures test individual design choices in the communication and policy architecture. Fleet-size, trajectory, and message-space analyses then examine whether the resulting cooperation remains effective as interaction density changes, how communication alters the realized motion, and what information is retained in the learned latent channel. The final two studies address heterogeneous communication capability and compatibility with route-level planning.
 }
 
 % ---------------------------------------------------------------------
@@ -444,6 +446,82 @@ The result is therefore a safety-and-stability result, not a claim that delayed 
 }
 
 % ---------------------------------------------------------------------
+\subsection{Fleet-Size Scalability}
+\label{sec:scalability_result}
+
+% PLACEHOLDER FIGURE: keep the legacy scalability artwork in the manuscript.
+% Before submission regenerate it from frozen qd_MOE_SE and qf_SE_OFF checkpoints,
+% N = 4/8/16, seeds 42--44, ring = 0.7, radar = 56 m, comm = 420 m.
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=.86\textwidth]{figure/fig5_vessel_number_scalability}
+    \caption{Fleet-size scalability of communication-enabled and communication-disabled navigation. The final regenerated figure will evaluate the same frozen policy families at 4, 8, and 16 vessels and report collision rate, COLREGs compliance, and arrival rate under the common experimental configuration.}
+    \label{fig:scalability}
+\end{figure*}
+
+{\color{red}
+The preceding experiments use 16 vessels and therefore establish the benefit of the proposed design at one traffic density. A separate scalability test is needed because increasing the fleet size changes the number and frequency of simultaneous encounters even though the neural policy itself is parameter shared. Fig.~\ref{fig:scalability} varies the number of active vessels while keeping the policy architecture unchanged.
+
+There are two distinct notions of scalability in this framework. First, \emph{representation scalability} follows directly from the design: the policy parameters do not depend on fleet size, and the received communication feature remains six dimensional because at most four grounded neighbor messages are combined by a masked mean. The network input therefore does not grow when additional vessels are introduced. Second, \emph{behavioral scalability} must be measured experimentally because denser traffic can still create more coupled conflicts than the policy encountered at a lower density.
+
+The scalability figure is consequently interpreted by the relative degradation of the communication-ON and communication-OFF policies as $N$ increases, rather than by a single absolute metric. The desired behavior is that collision and compliance degrade more slowly with communication while arrival does not collapse. Such a result would show that the benefit of exchanging a bounded number of locally relevant messages is retained as the surrounding fleet becomes denser. It would not, by itself, establish an asymptotic computational-complexity result; the experiment evaluates navigation robustness to fleet size. The current artwork is retained for manuscript continuity and will be replaced by the matched 4/8/16-vessel evaluation from the present checkpoints.
+}
+
+% ---------------------------------------------------------------------
+\subsection{Qualitative Trajectory Analysis}
+\label{sec:trajectory_result}
+
+% PLACEHOLDER FIGURES: retain the previous trajectory artwork only for layout and narrative.
+% Regenerate from the current OFF/ON checkpoint families with identical initial conditions,
+% and annotate first communication availability, first local radar contact, path length,
+% heading travel, and minimum separation. Do not reuse old 60/83 m numerical annotations.
+\begin{figure*}[!t]
+    \centering
+    \begin{subfigure}[t]{0.58\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figure/fig2_scenario_1}
+        \caption{Matched representative encounter.}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.38\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figure/fig2_scenario_1_overlay}
+        \caption{Overlay of the own-ship trajectories.}
+    \end{subfigure}
+    \caption{Representative trajectory comparison with and without learned communication under matched initial encounter geometry. In the final regenerated figure, the annotations will use the common 56~m radar and 420~m communication ranges and mark when communication becomes available relative to local radar observation.}
+    \label{fig:trajectory_analysis}
+\end{figure*}
+
+{\color{red}
+Aggregate collision and compliance rates show \emph{whether} communication helps, but they do not show \emph{how} the resulting control behavior changes. Fig.~\ref{fig:trajectory_analysis} therefore compares representative rollouts from the communication-OFF and communication-ON policy families under the same initial encounter geometry. The purpose of this analysis is not to select a visually favorable episode, but to expose the temporal mechanism suggested by the aggregate results.
+
+Because the communication radius is 420~m while the local radar range is 56~m, a receiver can obtain a grounded message from a vessel well before that vessel appears in its own radar scan. The message does not transmit a hand-designed avoidance command; it carries the sender's learned local representation and is paired with receiver-computed relative geometry. When the channel is useful, the expected behavioral signature is therefore an earlier and shallower adjustment rather than a large reactive maneuver after short-range detection.
+
+The final regenerated trajectory plot will mark the first communication-available instant, the first local radar contact, and the point at which the two control trajectories begin to diverge. Path length, cumulative heading travel, and minimum separation will be reported alongside the geometry. These quantities connect the trajectory-level mechanism to the aggregate observations in Fig.~\ref{fig:comm_necessity}: lower collision and heading travel are consistent with advance coordination only if the communicated policy begins resolving the encounter earlier without sacrificing separation. Since the OFF and ON curves originate from separately trained matched arms, the trajectory is used as a behavioral illustration rather than as a causal intervention on a single fixed policy.
+}
+
+% ---------------------------------------------------------------------
+\subsection{Learned Message-Space Analysis}
+\label{sec:message_space_result}
+
+% PLACEHOLDER FIGURE: retain the legacy t-SNE artwork, but regenerate from the current
+% 6D messages. The final comparison should use the current 41D MessageActor input feature
+% (or explicitly state 369D raw env observation if that is chosen), not the old 371D label.
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=.95\textwidth]{figure/fig3_tsne_combined}
+    \caption{Low-dimensional visualization of the learned communication representation. The final regenerated analysis will compare the current policy feature and six-dimensional message space and color the message embedding by COLREGs context and continuous threat/navigation variables.}
+    \label{fig:message_space}
+\end{figure*}
+
+{\color{red}
+The six-dimensional message is learned jointly with navigation and is not assigned a predefined semantic meaning. Fig.~\ref{fig:message_space} therefore examines the structure of the learned message space using t-SNE as an exploratory visualization. The final analysis will collect messages from frozen-policy evaluation rollouts and compare the 41-dimensional MessageActor input feature with the transmitted six-dimensional representation. Encounter-only samples will also be shown separately so that the embedding is not dominated by the more frequent None state.
+
+The most useful interpretation is not whether t-SNE produces visually separated COLREGs clusters. The situation one-hot vector is already supplied to the MessageActor, so class separation alone can partly reflect an explicit input rather than an emergent communication protocol. In addition, t-SNE preserves local neighborhoods rather than global distances. For these reasons, the embedding is used to examine whether the compact message retains \emph{within-situation} variation associated with information that is useful to another vessel.
+
+Accordingly, the final panels will color the same message embedding by continuous quantities such as dominant-threat bearing, normalized threat distance, closing tendency, goal distance, speed, or goal-relative angle. Smooth organization with respect to these variables would be consistent with the role of the ThreatDecoder, which directly encourages the message to preserve collision-relevant local information. The t-SNE result is therefore treated as qualitative representation evidence, while the decoder objective and the communication ablations provide the stronger functional evidence that the channel is useful. This distinction avoids interpreting geometric separation in a two-dimensional projection as proof of message semantics.
+}
+
+% ---------------------------------------------------------------------
 \subsection{How Robust Is the Policy to Heterogeneous Communication?}
 \label{sec:mixed_result}
 
@@ -457,7 +535,7 @@ The result is therefore a safety-and-stability result, not a claim that delayed 
 {\color{red}
 Fig.~\ref{fig:heterogeneous_fleet} evaluates a practical deployment question: does the learned policy fail abruptly when some vessels cannot broadcast? A fixed trained policy is evaluated while 2--14 of the 16 vessels are changed to receive-only operation. The experiment is conceptually useful because it isolates the loss of transmitted cooperative information without removing the receiver's ability to consume messages from equipped vessels.
 
-The archived raw-data bundle produces a smooth composition-dependent trend rather than a categorical failure, but these numbers are not used for a final robustness claim in this revision. Re-aggregation of the available raw data gives a different collision/compliance range and a different seed count from an earlier delivered figure. The discrepancy must be resolved before submission. The figure is retained here because the experiment belongs in the manuscript structure; its interpretation will be finalized only after provenance is locked.
+The archived raw-data bundle produces a composition-dependent trend rather than a categorical failure, but these numbers are not used for a final robustness claim in this revision. Re-aggregation of the available raw data gives a different collision/compliance range and a different seed count from an earlier delivered figure. The discrepancy must be resolved before submission. The figure is retained because the experiment belongs in the manuscript structure; its quantitative interpretation will be finalized only after provenance is locked.
 }
 
 % ---------------------------------------------------------------------
@@ -482,9 +560,11 @@ For that reason, the final navigation-performance comparison must report both al
 % ---------------------------------------------------------------------
 \subsection{Overall Interpretation}
 {\color{red}
-Taken together, Figs.~\ref{fig:comm_necessity}--\ref{fig:comm_timing} support a coherent algorithmic interpretation. Communication addresses missing local information; spatial grounding prevents message identity from being lost during multi-neighbor aggregation; shared perception avoids duplicating the dominant representation cost across COLREGs situations; situation-specific decision cores preserve behaviorally different obligations; directional COLREGs shaping supplies a common maneuver convention; and delayed channel activation reduces the optimization instability of learning navigation and communication simultaneously.
+Taken together, the component-wise experiments and the three behavior-level analyses support a coherent interpretation of the proposed design. Communication addresses missing local information; spatial grounding prevents message origin from being lost during multi-neighbor aggregation; shared perception avoids duplicating the dominant representation cost across COLREGs situations; situation-specific decision cores preserve behaviorally different obligations; directional COLREGs shaping supplies a common maneuver convention; and delayed channel activation reduces the optimization instability of learning navigation and communication simultaneously.
 
-This interpretation is stronger than selecting the best number in each ablation independently. The method is a decomposition of the cooperative-navigation problem according to which information should be shared, specialized, or communicated. The final two studies extend that decomposition toward deployment: Fig.~\ref{fig:heterogeneous_fleet} asks whether cooperation degrades gracefully when communication capability is mixed, and Fig.~\ref{fig:astar_integration} asks whether the local learned controller can sit underneath a conventional route planner.
+The scalability, trajectory, and message-space analyses answer different questions from the ablations. Fleet-size evaluation asks whether the benefit survives an increasing number of simultaneous interactions while the policy input dimension remains fixed. Trajectory analysis asks whether the aggregate safety gain is accompanied by the anticipated earlier and smoother avoidance behavior. Message-space analysis asks whether the learned six-dimensional bottleneck retains structured threat and navigation information rather than merely reproducing an encounter label. Together, they connect the numerical ablations to the operating mechanism of the learned cooperative policy.
+
+This interpretation is stronger than selecting the best number in each ablation independently. The method is a decomposition of the cooperative-navigation problem according to which information should be shared, specialized, or communicated. The heterogeneous-fleet experiment then asks whether this cooperation degrades gracefully when communication capability is mixed, and the A* experiment asks whether the local learned controller can sit underneath a conventional route planner.
 }
 
 % =====================================================================
@@ -495,7 +575,7 @@ This paper presented a communication-enabled cooperative navigation framework fo
 
 The controlled experiments show that these choices address distinct failure modes. Communication lowers collision rate and particularly improves crossing coordination. Aggregating several neighbors is safer than retaining only the nearest vessel. Sharing perception provides a substantially better safety--parameter tradeoff than either a single network or full expert duplication. Directional COLREGs shaping functions as a coordination prior, and introducing communication after local navigation has stabilized yields much lower collision and lower seed sensitivity than activating communication from the first training step.
 
-The current study abstracts the physical communication channel as range-limited message exchange. The heterogeneous-fleet and A* experiments also contain identified provenance or evaluation tasks that are explicitly separated from the finalized primary results. Future work will resolve these remaining evaluations, incorporate latency, packet loss, and bandwidth constraints, train directly with route-level waypoint sequences, and test the learned controller in higher-fidelity maritime traffic environments.
+Fleet-size, representative-trajectory, and message-space analyses are retained as part of the main evaluation because they provide evidence at a different level from the component ablations: they examine density robustness, realized avoidance behavior, and the structure of the learned communication representation. The existing artwork for these analyses will be regenerated from the current checkpoint family before submission so that all numerical annotations follow the same simulator configuration. The current study otherwise abstracts the physical communication channel as range-limited message exchange. Future work will incorporate latency, packet loss, and bandwidth constraints, train directly with route-level waypoint sequences, and test the learned controller in higher-fidelity maritime traffic environments.
 }
 
 \section*{Acknowledgement}
