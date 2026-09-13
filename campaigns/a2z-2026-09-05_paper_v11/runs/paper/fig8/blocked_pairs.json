@@ -1,0 +1,1931 @@
+{
+  "n_total": 320,
+  "n_blocked": 212,
+  "n_clear": 108,
+  "blocked_frac": 0.6625,
+  "note": "Report Fig8 metrics on blocked subset separately; overall mean dilutes clear pairs.",
+  "blocked": [
+    {
+      "spawn": 0,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 0,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 0,
+      "goal": 6,
+      "n_wpt": 5,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 0,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 0,
+      "goal": 8,
+      "n_wpt": 4,
+      "straight": 445.47727214752496
+    },
+    {
+      "spawn": 0,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 0,
+      "goal": 10,
+      "n_wpt": 5,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 0,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 0,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 1,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 1,
+      "goal": 5,
+      "n_wpt": 3,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 1,
+      "goal": 6,
+      "n_wpt": 4,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 1,
+      "goal": 8,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 1,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 1,
+      "goal": 10,
+      "n_wpt": 3,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 1,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 1,
+      "goal": 12,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 1,
+      "goal": 13,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 1,
+      "goal": 14,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 1,
+      "goal": 15,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 2,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 2,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 2,
+      "goal": 6,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 2,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 2,
+      "goal": 8,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 2,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 2,
+      "goal": 10,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 2,
+      "goal": 12,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 2,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 2,
+      "goal": 14,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 2,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 3,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 3,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 3,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 3,
+      "goal": 6,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 3,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 3,
+      "goal": 8,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 3,
+      "goal": 10,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 3,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 3,
+      "goal": 12,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 3,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 3,
+      "goal": 14,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 4,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 4,
+      "goal": 5,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 4,
+      "goal": 6,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 4,
+      "goal": 7,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 4,
+      "goal": 8,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 4,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 4,
+      "goal": 10,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 4,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 4,
+      "goal": 12,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 4,
+      "goal": 14,
+      "n_wpt": 4,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 4,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 5,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 5,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 5,
+      "goal": 9,
+      "n_wpt": 3,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 5,
+      "goal": 10,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 5,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 5,
+      "goal": 12,
+      "n_wpt": 4,
+      "straight": 445.47727214752496
+    },
+    {
+      "spawn": 5,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 5,
+      "goal": 14,
+      "n_wpt": 5,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 5,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 6,
+      "goal": 0,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 6,
+      "goal": 1,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 6,
+      "goal": 2,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 6,
+      "goal": 3,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 6,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 6,
+      "goal": 9,
+      "n_wpt": 3,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 6,
+      "goal": 10,
+      "n_wpt": 3,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 6,
+      "goal": 12,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 6,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 6,
+      "goal": 14,
+      "n_wpt": 3,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 6,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 7,
+      "goal": 0,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 7,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 7,
+      "goal": 2,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 7,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 7,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 7,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 7,
+      "goal": 10,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 7,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 7,
+      "goal": 12,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 7,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 7,
+      "goal": 14,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 8,
+      "goal": 0,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 8,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 8,
+      "goal": 2,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 8,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 8,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 8,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 8,
+      "goal": 10,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 8,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 8,
+      "goal": 12,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 8,
+      "goal": 14,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 8,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 9,
+      "goal": 0,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 9,
+      "goal": 2,
+      "n_wpt": 4,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 9,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 9,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 9,
+      "goal": 9,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 9,
+      "goal": 10,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 9,
+      "goal": 11,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 9,
+      "goal": 12,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 9,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 9,
+      "goal": 14,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 9,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 10,
+      "goal": 0,
+      "n_wpt": 4,
+      "straight": 445.47727214752496
+    },
+    {
+      "spawn": 10,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 10,
+      "goal": 2,
+      "n_wpt": 5,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 10,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 10,
+      "goal": 4,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 10,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 10,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 10,
+      "goal": 14,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 10,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 11,
+      "goal": 0,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 11,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 11,
+      "goal": 2,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 11,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 11,
+      "goal": 4,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 11,
+      "goal": 5,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 11,
+      "goal": 6,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 11,
+      "goal": 7,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 11,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 11,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 11,
+      "goal": 14,
+      "n_wpt": 3,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 12,
+      "goal": 0,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 12,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 12,
+      "goal": 2,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 12,
+      "goal": 4,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 12,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 12,
+      "goal": 6,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 12,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 12,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 12,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 12,
+      "goal": 14,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 12,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 13,
+      "goal": 0,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 13,
+      "goal": 2,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 13,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 13,
+      "goal": 4,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 13,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 13,
+      "goal": 6,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 13,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 13,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 13,
+      "goal": 13,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 13,
+      "goal": 14,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 13,
+      "goal": 15,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 14,
+      "goal": 0,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 14,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 14,
+      "goal": 2,
+      "n_wpt": 3,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 14,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 14,
+      "goal": 4,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 14,
+      "goal": 6,
+      "n_wpt": 3,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 14,
+      "goal": 7,
+      "n_wpt": 3,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 14,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 14,
+      "goal": 13,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 14,
+      "goal": 14,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 14,
+      "goal": 15,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 15,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 15,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 15,
+      "goal": 2,
+      "n_wpt": 5,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 15,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 15,
+      "goal": 4,
+      "n_wpt": 4,
+      "straight": 445.47727214752496
+    },
+    {
+      "spawn": 15,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 15,
+      "goal": 6,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 15,
+      "goal": 7,
+      "n_wpt": 3,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 15,
+      "goal": 8,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 16,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 16,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 16,
+      "goal": 2,
+      "n_wpt": 4,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 16,
+      "goal": 4,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 16,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 16,
+      "goal": 6,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 16,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 16,
+      "goal": 8,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 16,
+      "goal": 9,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 16,
+      "goal": 10,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 16,
+      "goal": 11,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 17,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 17,
+      "goal": 2,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 17,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 17,
+      "goal": 4,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 17,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 17,
+      "goal": 6,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 17,
+      "goal": 8,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 17,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 17,
+      "goal": 10,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 17,
+      "goal": 11,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 17,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 18,
+      "goal": 0,
+      "n_wpt": 2,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 18,
+      "goal": 1,
+      "n_wpt": 2,
+      "straight": 148.49242404917499
+    },
+    {
+      "spawn": 18,
+      "goal": 2,
+      "n_wpt": 2,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 18,
+      "goal": 3,
+      "n_wpt": 2,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 18,
+      "goal": 4,
+      "n_wpt": 4,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 18,
+      "goal": 6,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 18,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 18,
+      "goal": 8,
+      "n_wpt": 4,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 18,
+      "goal": 9,
+      "n_wpt": 2,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 18,
+      "goal": 10,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 18,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 19,
+      "goal": 1,
+      "n_wpt": 3,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 19,
+      "goal": 2,
+      "n_wpt": 2,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 19,
+      "goal": 3,
+      "n_wpt": 3,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 19,
+      "goal": 4,
+      "n_wpt": 3,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 19,
+      "goal": 5,
+      "n_wpt": 2,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 19,
+      "goal": 6,
+      "n_wpt": 3,
+      "straight": 332.03915431767985
+    },
+    {
+      "spawn": 19,
+      "goal": 7,
+      "n_wpt": 2,
+      "straight": 360.347054934545
+    },
+    {
+      "spawn": 19,
+      "goal": 8,
+      "n_wpt": 3,
+      "straight": 399.06139878469827
+    },
+    {
+      "spawn": 19,
+      "goal": 10,
+      "n_wpt": 4,
+      "straight": 301.0813843464919
+    },
+    {
+      "spawn": 19,
+      "goal": 11,
+      "n_wpt": 3,
+      "straight": 266.5520587052368
+    },
+    {
+      "spawn": 19,
+      "goal": 12,
+      "n_wpt": 2,
+      "straight": 247.48737341529164
+    }
+  ],
+  "clear": [
+    {
+      "spawn": 0,
+      "goal": 0,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 0,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 0,
+      "goal": 2,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 0,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 0,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 0,
+      "goal": 14,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 0,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 1,
+      "goal": 0,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 1,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 1,
+      "goal": 2,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 1,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 1,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 2,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 2,
+      "goal": 2,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 2,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 2,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 2,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 3,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 3,
+      "goal": 2,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 3,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 3,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 3,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 4,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 4,
+      "goal": 2,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 4,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 4,
+      "goal": 4,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 4,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 5,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 5,
+      "goal": 2,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 5,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 5,
+      "goal": 4,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 5,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 5,
+      "goal": 6,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 5,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 6,
+      "goal": 4,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 6,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 6,
+      "goal": 6,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 6,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 6,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 7,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 7,
+      "goal": 6,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 7,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 7,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 7,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 8,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 8,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 8,
+      "goal": 6,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 8,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 8,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 9,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 9,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 9,
+      "goal": 6,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 9,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 9,
+      "goal": 8,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 10,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 10,
+      "goal": 6,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 10,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 10,
+      "goal": 8,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 10,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 10,
+      "goal": 10,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 10,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 11,
+      "goal": 8,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 11,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 11,
+      "goal": 10,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 11,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 11,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 12,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 12,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 12,
+      "goal": 10,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 12,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 12,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 13,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 13,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 13,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 13,
+      "goal": 10,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 13,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 14,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 14,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 14,
+      "goal": 10,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 14,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 14,
+      "goal": 12,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 15,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 15,
+      "goal": 10,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 15,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 15,
+      "goal": 12,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 15,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 15,
+      "goal": 14,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 15,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 247.48737341529164
+    },
+    {
+      "spawn": 16,
+      "goal": 3,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 16,
+      "goal": 12,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 16,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 16,
+      "goal": 14,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 16,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 17,
+      "goal": 1,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 17,
+      "goal": 7,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 17,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 17,
+      "goal": 14,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 17,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 18,
+      "goal": 5,
+      "n_wpt": 1,
+      "straight": 316.9384798348096
+    },
+    {
+      "spawn": 18,
+      "goal": 11,
+      "n_wpt": 1,
+      "straight": 204.08331631958552
+    },
+    {
+      "spawn": 18,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 18,
+      "goal": 14,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 18,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 19,
+      "goal": 0,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    },
+    {
+      "spawn": 19,
+      "goal": 9,
+      "n_wpt": 1,
+      "straight": 346.4823227814083
+    },
+    {
+      "spawn": 19,
+      "goal": 13,
+      "n_wpt": 1,
+      "straight": 178.46568297574746
+    },
+    {
+      "spawn": 19,
+      "goal": 14,
+      "n_wpt": 1,
+      "straight": 110.67971810589327
+    },
+    {
+      "spawn": 19,
+      "goal": 15,
+      "n_wpt": 1,
+      "straight": 49.49747468305833
+    }
+  ]
+}
