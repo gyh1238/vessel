@@ -1,0 +1,8 @@
+﻿=== Fig2 formal SINGLE (common_freeze_v11) 2026-09-11 01:30 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s42 SINGLE | goal=97.9% oColl=0% colregsOK=56.8%
+s43 SINGLE | goal=93.9% oColl=0% colregsOK=52.6%
+s44 SINGLE | goal=95.1% oColl=0.9% colregsOK=53.1%
+
+mean goal=95.6%  (hub ON mean=93.7%, dGoal=1.9)

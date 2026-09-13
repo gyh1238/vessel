@@ -1,0 +1,16 @@
+=== Fig4 msg-dim trend (common_freeze_v11) 2026-09-11 20:56 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+hub = DIM6 (qd_MOE_SE formal ON mean from FIG1)
+
+dim  mean_goal  delta_vs_hub
+2    91.7%      -2.0pp
+4    91.9%      -1.8pp
+6    93.7%       0.0pp   (hub)
+8    91.7%      -2.0pp
+10   90.6%      -3.1pp
+12   92.5%      -1.2pp
+
+notes:
+- All dims below hub; soft U-shape with dip at DIM10.
+- DIM12 recovers toward hub (-1.2pp) vs DIM10 (-3.1pp).
+- Per-seed files: FIG4_FORMAL_DIM{N}_s{42,43,44}.txt + aggregates FIG4_FORMAL_DIM{N}.txt

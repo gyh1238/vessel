@@ -1,0 +1,5 @@
+﻿=== Fig3 formal NEAR1 s44 (common_freeze_v11) 2026-09-11 06:54 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 max_partners=1
+
+s44 NEAR1 | goal=92.7% vColl=7.3% oColl=0% colregsOK=47.9%
+log: runs/paper/eval/qf_SE_NEAR1_s44_ON.log

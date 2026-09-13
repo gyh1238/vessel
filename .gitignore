@@ -1,0 +1,42 @@
+# GitHub 에 올리지 않는 것 (로컬 전용)
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.bin
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.venv/
+.env
+*.pem
+
+# 옛 팔 체크아웃 · Unity 덤프 · 잠긴 repro 미러
+archive/
+repro/
+models/
+
+# 중첩 git (깨진 worktree 포함) — 서브모듈로 넣지 않음
+**/.git
+
+# 캠페인 대용량 산출
+campaigns/**/ckpts/
+campaigns/**/eval/
+campaigns/**/eval_v2/
+campaigns/**/logs/
+campaigns/**/*.log
+campaigns/**/*.log.err
+campaigns/**/train_meta/*.csv
+campaigns/**/train_meta/*.heartbeat
+campaigns/**/runs/paper/*.pt
+campaigns/**/runs/archive/
+
+# 최신 코드 미러의 옛 플롯 스크립트
+main/Python/_archive/
+
+# 에디터
+.cursor/
+.vscode/
+*.swp

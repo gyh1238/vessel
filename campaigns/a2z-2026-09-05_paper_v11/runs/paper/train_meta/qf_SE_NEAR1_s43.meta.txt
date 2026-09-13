@@ -1,0 +1,8 @@
+﻿tag=qf_SE_NEAR1_s43 arm=ON seed=43 gpu=3
+freeze=c6d7099b9d31 version=common_freeze_v11
+fig=fig3
+CLI: steps=16000000 envs=128 ring=0.7 partners=1 comm_on_at=9000000 msg_dim=6
+override: 
+principle: shared WORKING baseline across Fig1-8; one axis only; not YHSH coef clone
+gate: collapse-only (see gate_paper_collapse.ps1)
+started=2026-09-11T03:20:57.4348571+09:00

@@ -1,0 +1,7 @@
+﻿Fig8 paper eval seed=42 ckpt=F:\projects\vessel\repro\a2z-2026-09-05\runs\paper\qd_MOE_SE_s42.pt
+Policy = hub qd_MOE_SE (NOT ql_SE_START).
+Generated=2026-09-12T05:02:04.0397887+09:00
+hub_s42_OFF_astar.log: qd_MOE_SE_s42.pt           | arm=OFF    path=astar  | goal= 56.1%  vColl=  7.9%  oColl=  0.4%  TO= 35.6%  | 4228 eps || [goal-ep] fuel= 964.9  headTravel=  2557deg  minSep= 20.1m  len= 1012  | allMinS
+hub_s42_OFF_direct.log: qd_MOE_SE_s42.pt           | arm=OFF    path=direct | goal= 57.7%  vColl=  7.0%  oColl=  0.2%  TO= 35.1%  | 4298 eps || [goal-ep] fuel= 892.0  headTravel=  2083deg  minSep= 20.7m  len=  925  | allMinS
+hub_s42_ON_astar.log: qd_MOE_SE_s42.pt           | arm=ON     path=astar  | goal= 54.5%  vColl=  9.3%  oColl=  0.4%  TO= 35.8%  | 4254 eps || [goal-ep] fuel= 961.1  headTravel=  2536deg  minSep= 20.1m  len= 1008  | allMinS
+hub_s42_ON_direct.log: qd_MOE_SE_s42.pt           | arm=ON     path=direct | goal= 57.4%  vColl=  8.3%  oColl=  0.2%  TO= 34.1%  | 4321 eps || [goal-ep] fuel= 891.4  headTravel=  2094deg  minSep= 20.7m  len=  926  | allMinS

@@ -1,0 +1,45 @@
+# paper/ layout — common_freeze_v11 (reorganized 2026-09-12)
+
+runs/paper/
+├── STRUCTURE.txt          ← this file
+├── results/               ← human-facing summaries (start here)
+│   ├── CAMPAIGN_V11.txt
+│   ├── HUB_FORMAL_ON.txt
+│   ├── FIG1/ … FIG8/      ← per-figure FORMAL / TREND / GATE
+├── ckpts/
+│   ├── final/             ← 39 FINAL *.pt (canonical)
+│   └── steps/             ← 312 mid-train *.step{2..16}M.pt
+├── train_meta/            ← *.csv / *.heartbeat / *.meta.txt
+├── eval/                  ← formal eval_ckpt logs
+├── fig7/                  ← mixed-fleet CSV (+ episodes)
+├── fig8/                  ← A* vs direct logs + blocked_pairs.json
+├── gate/                  ← collapse-gate mid-evals
+└── <tag>.pt               ← hardlink → ckpts/final/<tag>.pt
+                             (so existing scripts still resolve paper/*.pt)
+
+Tag → figure map
+----------------
+qd_MOE_SE_*          hub / Fig1 ON
+qf_SE_OFF_*          Fig1 OFF
+q_MOE_SINGLE_*       Fig2 SINGLE
+q_MOE_ISO_*          Fig2 THIN
+base_comm_*          Fig2 THICK
+qf_SE_NEAR1_*        Fig3 NEAR1
+q_DIM{2,4,8,10,12}_* Fig4 msg-dim
+qo_SE_COLREGSOFF_*   Fig5 COLREGS-off
+ql_SE_START_*        Fig6 early-comm
+
+Related
+-------
+runs/PAPER_FREEZE.md           freeze notes
+Python/paper_freeze.env        freeze env (hash in CAMPAIGN_V11)
+runs/logs/campaign_v11/        formal waiters / fig7–8 launch logs
+runs/archive/paper_freeze_v*/  older freezes (v2–v10)
+
+Quick open
+----------
+results/FIG1/FIG1_FORMAL_COMPARE.txt
+results/FIG4/FIG4_TREND.txt
+results/FIG6/FIG6_FORMAL.txt
+results/FIG7/FIG7_FORMAL.txt
+results/FIG8/FIG8_FORMAL.txt

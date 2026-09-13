@@ -1,0 +1,19 @@
+﻿=== Fig7 mixed-fleet rx (hub qd_MOE_SE) common_freeze_v11 2026-09-12 04:05 ===
+protocol: mode=rx sweep=2..14 envs_per=14 burnin=1200 eval_decisions=4500
+seeds=42,43,44
+
+nocomm | group  | mean goal | mean coll | n_rows
+     2 | nocomm  |     89.4% |     10.6% | 3
+     2 | comm    |     88.6% |     11.4% | 3
+     4 | nocomm  |     88.7% |     11.3% | 3
+     4 | comm    |     89.4% |     10.6% | 3
+     6 | nocomm  |     87.1% |     12.9% | 3
+     6 | comm    |     88.3% |     11.7% | 3
+     8 | nocomm  |     91.9% |      8.1% | 3
+     8 | comm    |     91.2% |      8.8% | 3
+    10 | nocomm  |     91.5% |      8.5% | 3
+    10 | comm    |     89.4% |     10.6% | 3
+    12 | nocomm  |     91.9% |      8.1% | 3
+    12 | comm    |     84.7% |     15.3% | 3
+    14 | nocomm  |     88.3% |     11.7% | 3
+    14 | comm    |     89.0% |     11.0% | 3

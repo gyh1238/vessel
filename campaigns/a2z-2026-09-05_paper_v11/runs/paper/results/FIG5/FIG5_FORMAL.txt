@@ -1,0 +1,9 @@
+﻿=== Fig5 formal COLREGSOFF (common_freeze_v11) 2026-09-11 23:24 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+VESSEL_SIM_COLREGS_COEF=0
+
+s42 goal=94.1%
+s43 goal=95.7%
+s44 goal=96.3%
+mean goal=95.4%
+vs hub mean=93.7 : delta=1.7pp

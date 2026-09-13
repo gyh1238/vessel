@@ -1,0 +1,5 @@
+﻿=== Fig2 formal THICK s42 (common_freeze_v11) 2026-09-11 08:33 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s42 THICK | goal=87.9% vColl=11.2% oColl=0.9% colregsOK=46.2%
+log: runs/paper/eval/base_comm_s42_ON.log

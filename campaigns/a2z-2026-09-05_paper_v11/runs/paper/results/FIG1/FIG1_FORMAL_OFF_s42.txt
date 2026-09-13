@@ -1,0 +1,5 @@
+﻿=== Fig1 formal OFF s42 (common_freeze_v11) 2026-09-10 20:58 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s42 OFF | goal=88.5% vColl=11.5% oColl=0% colregsOK=50.7%
+log: runs/paper/eval/qf_SE_OFF_s42_OFF.log

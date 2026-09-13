@@ -1,0 +1,10 @@
+﻿=== Fig1 hub formal ON (common_freeze_v11) 2026-09-10 22:24 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s42 ON | goal=92.0% vColl=7.6% oColl=0.4% colregsOK=55.1%
+s43 ON | goal=96.0% vColl=4.0% oColl=0.0% colregsOK=54.5%
+s44 ON | goal=93.2% vColl=6.8% oColl=0.0% colregsOK=54.7%
+
+mean goal=93.7%  mean colregsOK=54.8%
+provisional vs OFF s42 (88.5%): mean dGoal=+5.2pp (await OFF s43/s44)
+logs: runs/paper/eval/qd_MOE_SE_s{42,43,44}_ON.log

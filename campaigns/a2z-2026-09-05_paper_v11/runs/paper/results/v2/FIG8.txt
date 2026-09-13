@@ -1,0 +1,8 @@
+Fig8 A* vs direct hub s42 (existing logs, no retrain)
+C/sit2 are STEP-legacy, NOT PRIMARY v2. prox = vColl (Fig8 denom already includes TO).
+
+arm    path        goal    prox      TO  C_step    sit2     fuel     head   minSep     len
+OFF    astar       56.1     7.9    35.6    54.4    42.4    964.9     2557     20.1    1012
+OFF    direct      57.7     7.0    35.1    54.6    42.6    892.0     2083     20.7     925
+ON     astar       54.5     9.3    35.8    54.5    42.6    961.1     2536     20.1    1008
+ON     direct      57.4     8.3    34.1    54.4    42.8    891.4     2094     20.7     926

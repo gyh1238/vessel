@@ -1,0 +1,10 @@
+﻿=== Fig1 formal ON vs OFF (common_freeze_v11) 2026-09-11 00:22 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+seed | ON goal/oColl/C     | OFF goal/oColl/C    | dGoal
+-----+---------------------+---------------------+------
+s42  |  92.0% /  0.4 / 55.1 |  88.5% /  0.0 / 50.7 | +3.5
+s43  |  96.0% /  0.0 / 54.5 |  92.6% /  0.0 / 52.0 | +3.4
+s44  |  93.2% /  0.0 / 54.7 |  90.0% /  0.7 / 51.4 | +3.2
+
+mean ON=93.7%  mean OFF=90.4%  mean dGoal=+3.3  => PASS

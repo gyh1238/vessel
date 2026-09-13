@@ -1,0 +1,4 @@
+﻿=== Fig6 formal START s43 2026-09-12 03:08 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+comm_on_at=0 (default freeze)
+ql_SE_START_s43.pt         | arm=ON     | goal= 93.6%  vColl=  5.9%  oColl=  0.5%  TO=  0.0%  | 437 eps || [goal-ep] fuel= 869.1  headTravel=  2118deg  minSep= 18.2m  len=  912  | allMinSep= 17.8m || epReward= 1598.60  colregs=0.5263  colregsOK= 52.6%  (n=23544) || sit1= 88.5%(n=625) sit2=  8.3%(n=10026) sit3= 88.3%(n=8372) sit4= 80.0%(n=4521)

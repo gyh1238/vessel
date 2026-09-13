@@ -1,0 +1,7 @@
+Fig1 PRIMARY v2 + YHSH metrics (goal among ended; prox among ended+open)
+goal=ended eps; prox=v-box overlap / (ended+open). Not labelled collision.
+
+arm                    goal       prox       C_v2       sit1       sit2       sit3       sit4       fuel       head     minSep        len  n
+ON (hub)           93.7±2.1    2.4±0.8   95.9±0.4   99.5±0.1   91.9±1.0   99.5±0.1   96.4±0.9 859.7±32.7 2025.3±172.1   20.9±1.0 880.0±25.5  3
+OFF                90.4±2.1    3.7±0.8   96.4±0.6   99.7±0.2   93.8±2.1   99.5±0.2   94.7±1.2 859.6±26.2 1855.7±231.3   20.8±0.3 889.3±24.0  3
+               dprox=+52.0% vs hub  dfuel=-0.0% vs hub  dhead=-8.4% vs hub

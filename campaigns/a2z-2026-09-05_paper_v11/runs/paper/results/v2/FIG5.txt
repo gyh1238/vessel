@@ -1,0 +1,6 @@
+Fig5 COLREGS term PRIMARY v2 + YHSH metrics
+
+arm                    goal       prox       C_v2       sit1       sit2       sit3       sit4       fuel       head     minSep        len  n
+COLREGS on (hub)   93.7±2.1    2.4±0.8   95.9±0.4   99.5±0.1   91.9±1.0   99.5±0.1   96.4±0.9 859.7±32.7 2025.3±172.1   20.9±1.0 880.0±25.5  3
+COLREGS off        95.4±1.1    1.8±0.4   67.5±2.1   89.8±4.3   59.2±4.7   70.4±1.2   79.0±7.8 811.9±32.8 1800.0±122.0   25.1±1.2 808.0±22.6  3
+               dprox=-27.5% vs hub  dfuel=-5.6% vs hub  dhead=-11.1% vs hub

@@ -1,0 +1,8 @@
+﻿=== Fig3 formal NEAR1 (common_freeze_v11) 2026-09-11 06:54 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 max_partners=1
+
+s42 goal=92.4% oColl=1.5% C=52.9%
+s43 goal=91% oColl=0% C=52.4%
+s44 goal=92.7% oColl=0% C=47.9%
+mean goal=92%
+vs hub mean=93.7 : delta=-1.7pp

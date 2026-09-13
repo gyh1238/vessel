@@ -1,0 +1,4 @@
+﻿=== Fig4 formal DIM4 s42 2026-09-11 12:50 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+VESSEL_MSG_DIM=4
+q_DIM4_s42.pt              | arm=ON     | goal= 93.2%  vColl=  6.3%  oColl=  0.6%  TO=  0.0%  | 543 eps || [goal-ep] fuel= 899.1  headTravel=  2080deg  minSep= 20.6m  len=  917  | allMinSep= 19.9m || epReward= 1647.13  colregs=0.5241  colregsOK= 52.4%  (n=34614) || sit1= 93.5%(n=1008) sit2=  6.0%(n=14621) sit3= 85.2%(n=14726) sit4= 88.7%(n=4259)

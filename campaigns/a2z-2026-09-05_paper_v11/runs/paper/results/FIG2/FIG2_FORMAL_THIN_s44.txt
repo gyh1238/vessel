@@ -1,0 +1,5 @@
+﻿=== Fig2 formal THIN s44 (common_freeze_v11) 2026-09-11 04:17 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s44 THIN | goal=90% vColl=8.5% oColl=1.5% colregsOK=44%
+log: runs/paper/eval/q_MOE_ISO_s44_ON.log

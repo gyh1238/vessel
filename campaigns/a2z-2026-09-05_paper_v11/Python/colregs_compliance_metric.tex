@@ -1,0 +1,66 @@
+\documentclass{article}
+
+\usepackage{kotex}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\begin{document}
+
+\subsection*{COLREGs Compliance Metric (PRIMARY)}
+
+COLREGs 준수도는 \textbf{쌍 조우(pair encounter)} 단위로 평가한다.
+두 선박이 COLREGs 상황(Head-on, Crossing, Overtaking)에 연속 5스텝 이상 놓인 구간을 하나의 조우 $k$로 정의하고, 해당 시간 구간을 $\mathcal{T}_k$로 표기한다.
+역할은 조우 진입 시점의 상황 분류로 고정한다(1: Head-on, 2: Crossing stand-on, 3: Crossing give-way, 4: Overtaking).
+
+주지표는 타각 유지비율이 아니라 Rule~8(침로·속력의 명백한 변경)과 Rule~17(stand-on 유지)에 맞춘 행동 판정이다.
+구 지표(스텝 타각 위반, 조우 중 $R_{\mathrm{stb}}{>}0.5$ 타각 유지)는 ``크게 한 번 틀고 안정''하는 정상 회피를 위반으로 잡기 쉬워 legacy로만 병기한다.
+
+\paragraph{관측량.}
+조우 구간에서 목표 방위 대비 우현 침로 오프셋의 최댓값 $\Delta\psi^{\mathrm{off}}_{\max}$,
+진입 속력 대비 최소 속력 감속률
+$\rho = 1 - v_{\min}/v_0$,
+진입 침로 대비 순 침로 변화 $|\Delta\psi|$ 를 기록한다.
+
+\paragraph{준수 조건 (PRIMARY).}
+\begin{table}[h]
+\centering
+\caption{COLREGs 상황별 PRIMARY 준수 판정. GW: Give-Way, SO: Stand-On.}
+\label{tab:colregs_criteria}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{상황} & \textbf{규칙} & \textbf{준수 조건} \\
+\midrule
+Head-on / Crossing (GW) / Overtaking
+  & Rule 8 / 13--16
+  & $\Delta\psi^{\mathrm{off}}_{\max} \ge 10^\circ \;\vee\; \rho \ge 0.15$ \\
+Crossing (SO)
+  & Rule 17
+  & $|\Delta\psi| \le 20^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Give-way 역할은 침로 변경(우현 오프셋 $\ge 10^\circ$) \emph{또는} 속력 변경(감속 $\ge 15\%$)으로 Rule~8의 ``clear alteration''을 만족하면 준수로 본다.
+Stand-on 역할은 조우 중 침로를 대체로 유지($|\Delta\psi|\le 20^\circ$)하면 준수로 본다.
+
+전체 준수율은 준수 조우 수를 전체 조우 수로 나눈 비율이다.
+논문·표의 \texttt{colregsOK} / 상황별 \texttt{sit*} 는 이 PRIMARY 값을 사용한다.
+
+\begin{equation}
+  C = \frac{N_{\mathrm{compliant}}}{N_{\mathrm{total}}}
+\end{equation}
+
+\paragraph{Legacy (비교용).}
+옛 정의는 조우 구간 정규화 타각 $\bar{\delta}_t$ 로부터
+$R_{\mathrm{stb}}$, $R_{\mathrm{port}}$, $R_{\mathrm{ck}}$ 비율을 내고
+Head-on/GW: $R_{\mathrm{stb}}{>}0.5 \wedge R_{\mathrm{port}}{<}0.2$,
+SO: $R_{\mathrm{ck}}{>}0.6$,
+Overtaking: $R_{\mathrm{stb}}{>}0.3$
+으로 판정했다. 평가 로그에 \texttt{[COLREGs legacy-step]} /
+\texttt{[encounter-COLREGs/legacy-rudder-hold]} 로만 출력한다.
+
+\end{document}

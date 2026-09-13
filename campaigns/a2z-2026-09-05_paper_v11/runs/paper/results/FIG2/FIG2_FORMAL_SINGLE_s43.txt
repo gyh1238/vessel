@@ -1,0 +1,5 @@
+﻿=== Fig2 formal SINGLE s43 (common_freeze_v11) 2026-09-11 01:24 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s43 SINGLE | goal=93.9% vColl=6.1% oColl=0% colregsOK=52.6%
+log: runs/paper/eval/q_MOE_SINGLE_s43_ON.log

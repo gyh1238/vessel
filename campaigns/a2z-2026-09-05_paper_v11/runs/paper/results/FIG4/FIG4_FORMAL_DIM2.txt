@@ -1,0 +1,9 @@
+﻿=== Fig4 formal DIM2 (common_freeze_v11) 2026-09-11 10:59 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+VESSEL_MSG_DIM=2
+
+s42 goal=93.8%
+s43 goal=90.5%
+s44 goal=90.8%
+mean goal=91.7%
+vs hub mean=93.7 : delta=-2pp

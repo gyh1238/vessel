@@ -1,0 +1,10 @@
+﻿=== Fig2 formal THIN (common_freeze_v11) 2026-09-11 05:11 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+MOE_WIDTH=0.44 SHARED=0
+
+s42 goal=91%
+s43 goal=93.5%
+s44 goal=90%
+mean goal=91.5%
+vs hub mean=93.7 : delta=-2.2pp
+vs SINGLE mean=95.6 : delta=-4.1pp

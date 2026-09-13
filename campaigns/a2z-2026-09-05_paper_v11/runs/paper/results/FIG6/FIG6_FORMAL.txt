@@ -1,0 +1,8 @@
+﻿=== Fig6 formal START (comm_on_at=0) common_freeze_v11 2026-09-12 03:26 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s42 goal=90.1%
+s43 goal=93.6%
+s44 goal=91.5%
+mean goal=91.7%
+vs hub mean=93.7 : delta=-2.0pp

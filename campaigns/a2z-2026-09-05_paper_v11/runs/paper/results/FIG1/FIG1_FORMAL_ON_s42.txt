@@ -1,0 +1,5 @@
+﻿=== Fig1 formal ON s42 (common_freeze_v11) 2026-09-10 22:24 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+
+s42 ON | goal=92.0% vColl=7.6% oColl=0.4% colregsOK=55.1%
+log: runs/paper/eval/qd_MOE_SE_s42_ON.log

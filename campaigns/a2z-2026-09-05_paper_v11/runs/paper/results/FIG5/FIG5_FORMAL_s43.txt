@@ -1,0 +1,4 @@
+﻿=== Fig5 formal COLREGSOFF s43 2026-09-11 23:06 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+VESSEL_SIM_COLREGS_COEF=0
+qo_SE_COLREGSOFF_s43.pt    | arm=ON     | goal= 95.7%  vColl=  4.3%  oColl=  0.0%  TO=  0.0%  | 462 eps || [goal-ep] fuel= 795.1  headTravel=  1764deg  minSep= 23.8m  len=  797  | allMinSep= 23.1m || epReward= 1208.46  colregs=0.3955  colregsOK= 39.6%  (n=28980) || sit1= 85.4%(n=690) sit2=  8.5%(n=11633) sit3= 58.2%(n=12121) sit4= 62.6%(n=4536)

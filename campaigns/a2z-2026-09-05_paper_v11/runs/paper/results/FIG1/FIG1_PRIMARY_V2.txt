@@ -1,0 +1,54 @@
+=== PRIMARY v2 re-eval (existing FINAL, no retrain) 2026-09-12 ===
+protocol: envs=64 burnin=800 eval_decisions=3000 ring=0.7 partners=4
+mode=v2 all-pairs (dominant and v11 lines also in each log)
+ckpts: F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11\runs\paper\ckpts\final
+logs: F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11\runs\paper\eval_v2
+doc: runs/paper/results/COLREGS_EVAL.md
+
+Means (3 seeds; SINGLE is s42 only)
+  hub ON   goal=93.7  vColl=6.1  C_v2=95.9  C_v11=54.8
+  Fig1 OFF goal=90.4  vColl=9.4  C_v2=96.4  C_v11=51.4
+  SINGLE s42 goal=97.9 vColl=2.1 C_v2=94.3 C_v11=56.8
+
+--- ON_s42 ---
+goal= 92.0%  vColl=  7.6%  oColl=  0.4%  colregsOK= 96.3%
+[COLREGs PRIMARY-v2] C= 96.3% sit2= 92.8%(n=14140) sit3= 99.5%(n=14541)
+[COLREGs PRIMARY-v2-dominant] C= 97.8%
+[COLREGs PRIMARY-v11] C= 55.1% sit2=  6.4%
+
+--- ON_s43 ---
+goal= 96.0%  vColl=  4.0%  oColl=  0.0%  colregsOK= 95.5%
+[COLREGs PRIMARY-v2] C= 95.5% sit2= 90.8%(n=15137) sit3= 99.5%(n=15554)
+[COLREGs PRIMARY-v2-dominant] C= 96.6%
+[COLREGs PRIMARY-v11] C= 54.5% sit2=  5.9%
+
+--- ON_s44 ---
+goal= 93.2%  vColl=  6.8%  oColl=  0.0%  colregsOK= 95.8%
+[COLREGs PRIMARY-v2] C= 95.8% sit2= 92.1%(n=13747) sit3= 99.4%(n=13303)
+[COLREGs PRIMARY-v2-dominant] C= 97.9%
+[COLREGs PRIMARY-v11] C= 54.7% sit2=  9.1%
+
+--- OFF_s42 ---
+goal= 88.5%  vColl= 11.5%  oColl=  0.0%  colregsOK= 97.0%
+[COLREGs PRIMARY-v2] C= 97.0% sit2= 96.1%(n=12766) sit3= 99.3%(n=9928)
+[COLREGs PRIMARY-v2-dominant] C= 98.4%
+[COLREGs PRIMARY-v11] C= 50.7% sit2=  7.2%
+
+--- OFF_s43 ---
+goal= 92.6%  vColl=  7.4%  oColl=  0.0%  colregsOK= 95.9%
+[COLREGs PRIMARY-v2] C= 95.9% sit2= 92.0%(n=12419) sit3= 99.6%(n=12272)
+[COLREGs PRIMARY-v2-dominant] C= 97.3%
+[COLREGs PRIMARY-v11] C= 52.0% sit2=  6.4%
+
+--- OFF_s44 ---
+goal= 90.0%  vColl=  9.3%  oColl=  0.7%  colregsOK= 96.3%
+[COLREGs PRIMARY-v2] C= 96.3% sit2= 93.2%(n=16139) sit3= 99.6%(n=15754)
+[COLREGs PRIMARY-v2-dominant] C= 97.5%
+[COLREGs PRIMARY-v11] C= 51.4% sit2=  7.1%
+
+--- SINGLE_s42 ---
+goal= 97.9%  vColl=  2.1%  oColl=  0.0%  colregsOK= 94.3%
+[COLREGs PRIMARY-v2] C= 94.3% sit2= 86.7%(n=20916) sit3= 99.6%(n=23705)
+[COLREGs PRIMARY-v2-dominant] C= 98.0%
+[COLREGs PRIMARY-v11] C= 56.8% sit2=  6.5%
+moe=False (cfg_snapshot)
