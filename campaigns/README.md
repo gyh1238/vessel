@@ -1,7 +1,8 @@
-# campaigns/ — isolated paper experiments
+# campaigns/ — paper freeze (GitHub main)
 
-This tree is **separate from** `main/` (GitHub DT_Vessel).
-Pulling/updating `main/` does **not** touch anything here.
+`a2z-2026-09-05_paper_v11/` 이 이 저장소의 **논문 본문**이다. `../main/` 은 최신 DT_Vessel 미러일 뿐, 논문 숫자·그림의 출처가 아니다.
+
+Fig1–8: [`a2z-2026-09-05_paper_v11/runs/paper/results/v2/figures/`](a2z-2026-09-05_paper_v11/runs/paper/results/v2/figures/)
 
 ## Snapshot
 

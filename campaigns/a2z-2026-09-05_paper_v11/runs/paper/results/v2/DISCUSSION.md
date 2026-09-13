@@ -177,6 +177,8 @@ flowchart LR
 
 ### Fig1 통신을 켜야 하나?
 
+![Fig1](figures/Fig1_Communication_necessity.png)
+
 비교: 메시지 **있음 vs 항상 0**. 구조는 같다.
 
 | | 도착 | 근접 |
@@ -190,17 +192,25 @@ flowchart LR
 
 ### Fig2 눈을 몇 벌 둘까?
 
+![Fig2](figures/Fig2_MoE_architecture.png)
+
 위 3절. 분리형은 실패. 단일망 ≥ 공유 ≫ 분리.
 
 ### Fig3 몇 척의 말을 들을까?
+
+![Fig3](figures/Fig3_Multi_neighbour_aggregation.png)
 
 1척만 vs 가까운 4척. 4척이 도착 92.0→93.7, 근접 2.9→2.4. 방향은 맞고 효과는 작다.
 
 ### Fig4 메시지는 몇 차원?
 
+![Fig4](figures/Fig4_Message_dimensionality.png)
+
 2…12 중 **6이 최고**. 더 넓혀도 이득이 없다. 준수로 고르면 안 된다 (전부 ~96).
 
 ### Fig5 규칙을 보상에 넣을까?
+
+![Fig5](figures/Fig5_COLREGs_shaping.png)
 
 규정 벌점을 끄면 도착·근접은 **더 좋아지고** (95.4 / 1.8), 준수는 **67%로 무너진다** (특히 유지 59%).  
 켜면 준수 96%, 항해는 조금 손해.
@@ -210,15 +220,21 @@ flowchart LR
 
 ### Fig6 통신을 언제 켜나?
 
+![Fig6](figures/Fig6_Communication_timing.png)
+
 처음부터 vs 학습 중반(9M). 늦게 켜는 쪽이 도착·근접이 낫다. 예전처럼 처음부터 켜면 정책이 붕괴하지는 않는다. 조금 나쁠 뿐이다.
 
 ### Fig7 일부만 송신하면? (재학습 없음)
+
+![Fig7](figures/Fig7_Heterogeneous_fleet.png)
 
 16척 중 몇 척이 **보내지는 못하고 듣기만** 한다. 곡선이 거의 평평하다.
 
 Fig1의 “끔”은 메시지를 **아예 안 넣는 것**이다. 듣기만 하는 배는 아직 남의 방송을 듣는다. 송신 2척만 있어도 정보가 돈다. 그래서 Fig1과 모순이 아닐 수 있다. 다만 지금 채점이 Fig1과 다른 자라, 같은 자로 다시 재는 게 먼저다.
 
 ### Fig8 전역 A* 경로를 붙이면? (재학습 없음)
+
+![Fig8](figures/Fig8_Global_path.png)
 
 해안선에서 직진 vs A* 경유점. 정책을 경로용으로 다시 배우지 않았다.
 

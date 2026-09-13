@@ -31,10 +31,14 @@ Python/analyze_mixed.py
 # Claude Code 로컬 설정·연구 노트(CLAUDE.md)·에이전트 정의 — 공개 repo 제외(로컬 전용)
 .claude/
 
-# 모델·피규어·궤적 데이터 (Assets 밖이 정석이나 가드)
+# 모델·피규어·궤적 데이터 (캠페인 루트 덤프만). 논문 결과 그림은 추적.
 models/
-figures/
+/figures/
 trajectory_data/
+
+# 논문 표·그림 (GitHub에서 보여야 함)
+!runs/paper/results/v2/metrics.csv
+!runs/paper/fig7/mixed_fleet_rx.csv
 
 # 임시/우발 산출물
 Python/C*Temprisk_calc.py
