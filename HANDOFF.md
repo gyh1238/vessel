@@ -9,27 +9,26 @@
 ## 0. 워크스페이스 지도 (필수)
 
 ```
-F:\projects\vessel\
-├── HANDOFF.md                 ← 이 문서
-├── README.md                  ← 폴더 역할 요약
-├── main\                      ← GitHub DT_Vessel origin/main (최신 코드 미러)
-├── campaigns\
-│   └── a2z-2026-09-05_paper_v11\   ← ★ 논문 캠페인 코드 + 결과 (작업 본체)
+F:\projects\vessel\                 ← ★ freeze v11 본문 (GitHub 루트)
+├── HANDOFF.md / README.md / DISCUSSION.md
+├── figures\ / results\
+├── Python\ Agent\ Management\ Navigation\
+├── latest\                    ← DT_Vessel 코드 미러 (논문 출처 아님)
 ├── reference\
 │   ├── YHSH_VESSEL\           ← 납품 그림·실험 설계 문서
 │   └── manuscripts\           ← .tex 초안
-├── archive\                   ← 옛 arm 포크, Unity 런 덤프, Comm_* 
-└── repro\                     ← 이동 잔여물(잠금). 사용 금지 → campaigns 사용
+├── archive\                   ← 옛 arm 포크, Unity 런 덤프 (gitignored)
+└── repro\                     ← 이동 잔여물(잠금). 사용 금지
 ```
 
 **캠페인 루트 (이하 `$C`):**  
-`F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11`
+`F:\projects\vessel`
 
 **결과 레이아웃:** `$C\runs\paper\STRUCTURE.txt`  
 **Freeze 노트:** `$C\runs\PAPER_FREEZE.md`  
 **Freeze env:** `$C\Python\paper_freeze.env` (hash `c6d7099b9d31`, version `common_freeze_v11`)
 
-`main\` 과 `$C` 는 **분리**되어 있다. `main`에 pull한 최신 코드를 캠페인 폴더에 맹목적으로 덮어쓰지 말 것.
+`latest\` 와 `$C` 는 **분리**되어 있다. `latest`에 pull한 최신 코드를 freeze 트리에 맹목적으로 덮어쓰지 말 것.
 
 ---
 
@@ -216,12 +215,12 @@ Tag 맵: `STRUCTURE.txt` 참고.
 Python: `C:\Users\JYH\miniconda3\envs\vessel_repro\python.exe`
 
 ```powershell
-cd F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11\Python
+cd F:\projects\vessel\Python
 . .\load_paper_freeze.ps1
 Set-PaperFreezeEnv   # Fig5만: Set-PaperFreezeEnv -Override @{ VESSEL_SIM_COLREGS_COEF = "0" }
 $env:CUDA_VISIBLE_DEVICES = "0"
 & "C:\Users\JYH\miniconda3\envs\vessel_repro\python.exe" -u eval_ckpt.py `
-  --ckpt F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11\runs\paper\qd_MOE_SE_s42.pt `
+  --ckpt F:\projects\vessel\runs\paper\qd_MOE_SE_s42.pt `
   --arm ON --envs 64 --burnin 800 --eval_decisions 3000 --ring 0.7 --max_partners 4 --device cuda:0
 ```
 
@@ -291,7 +290,7 @@ ON 93.7% vs OFF 90.4%, mean Δ **+3.3pp** (시드 +3.5/+3.4/+3.2). oColl 낮음.
 - Fig1 실패 시 그림별 핵 튜닝
 - Gate mid-eval(1500 dec 등) 숫자를 formal(3000)과 혼용
 - FINAL 무시하고 step ckpt로 논문 숫자 채우기
-- `main` 리팩터 코드를 검증 없이 캠페인 ckpt에 얹어 재학습
+- `latest` 리팩터 코드를 검증 없이 freeze ckpt에 얹어 재학습
 
 **사실 vs 추정**
 
@@ -306,7 +305,7 @@ ON 93.7% vs OFF 90.4%, mean Δ **+3.3pp** (시드 +3.5/+3.4/+3.2). oColl 낮음.
 ### P0 — 결과 보존·경로 고정 (추가 학습 없음)
 
 - 입력: `$C\runs\paper\**`
-- 내용: 새 Agent는 `$C`만 캠페인 루트로 사용. `main`과 섞지 않음.
+- 내용: 새 Agent는 `$C`만 freeze 루트로 사용. `latest`와 섞지 않음.
 - 산출: (유지)
 
 ### P1 — 논문 그림/표 초안을 **v11 formal 숫자**에 맞추기 (재학습 없음)
@@ -343,13 +342,13 @@ ON 93.7% vs OFF 90.4%, mean Δ **+3.3pp** (시드 +3.5/+3.4/+3.2). oColl 낮음.
 반드시 먼저 읽고 따르라:
 1) F:\projects\vessel\HANDOFF.md
 2) F:\projects\vessel\README.md
-3) F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11\runs\paper\STRUCTURE.txt
-4) F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11\runs\PAPER_FREEZE.md
+3) F:\projects\vessel\runs\paper\STRUCTURE.txt
+4) F:\projects\vessel\runs\PAPER_FREEZE.md
 5) 필요 시 results/FIG*/FIG*_FORMAL*.txt
 
 캠페인 코드·결과 루트는
-  F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11
-이다. main\ 은 GitHub 최신 미러일 뿐이며 캠페인과 섞지 마라.
+  F:\projects\vessel
+이다. `latest\` 는 DT_Vessel 미러일 뿐이며 freeze v11과 섞지 마라.
 
 제약:
 - 완료된 학습 FINAL 체크포인트·formal 결과·runs/paper 산출물을 삭제·덮어쓰기·재학습으로 대체하지 마라.

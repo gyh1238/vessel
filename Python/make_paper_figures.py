@@ -19,9 +19,10 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 HERE = Path(__file__).resolve().parent
-PAPER = HERE.parent / "runs" / "paper"
-CSV = PAPER / "results" / "v2" / "metrics.csv"
-OUT = PAPER / "results" / "v2" / "figures"
+ROOT = HERE.parent
+PAPER = ROOT / "runs" / "paper"
+CSV = ROOT / "results" / "metrics.csv"
+OUT = ROOT / "figures"
 YHSH_FIG = Path(r"F:\projects\vessel\reference\YHSH_VESSEL\paper_figures")
 sys.path.insert(0, str(YHSH_FIG))
 

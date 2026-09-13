@@ -1,29 +1,29 @@
 # 구현 · Freeze · 그림별 설정 — common_freeze_v11
 
 작성: 2026-09-13  
-캠페인 루트 `$C`: `F:\projects\vessel\campaigns\a2z-2026-09-05_paper_v11`  
+저장소 루트 `$C`: `F:\projects\vessel` (이 폴더가 freeze v11 본문)  
 논리 주장: [CLAIMS.md](CLAIMS.md)
 
-`main\` (GitHub 최신 미러)과 `$C`는 **다른 코드**다. 재평가·재학습·그림은 전부 `$C\Python`에서 freeze를 로드한 뒤 한다.
+`latest\` (DT_Vessel 미러)과 `$C`는 **다른 코드**다. 재평가·재학습·그림은 전부 `$C\Python`에서 freeze를 로드한 뒤 한다.
 
 ---
 
 ## 1. 디렉터리
 
 ```
-$C\
+$C\                              GitHub 루트 = freeze v11
+├── DISCUSSION.md / CLAIMS.md / IMPLEMENTATION.md
+├── figures\                     Fig1–8 png/pdf
+├── results\                     FIG*.txt, metrics.csv
 ├── Python\                      학습·평가·그림 스크립트
 │   ├── paper_freeze.env         공통 freeze (해시 대상 전체 파일)
 │   ├── load_paper_freeze.ps1    freeze 로드 + SHA
 │   ├── start_paper_train.ps1    Fig1–6 학습 (축 하나 override)
-│   ├── vessel_gym_train.py      PPO
-│   ├── vessel_gym.py            배치 시뮬
-│   ├── networks.py              Message / Control / Critic + MoE
 │   ├── eval_ckpt.py             Fig1–6 고정정책 평가 (PRIMARY v2)
-│   ├── eval_mixed.py            Fig7
-│   ├── astar_fig9\eval_astar_global.py   Fig8
-│   ├── aggregate_eval_v2.py     eval_v2 로그 → 표/CSV
-│   └── make_paper_figures.py    YHSH 레이아웃 png/pdf
+│   ├── aggregate_eval_v2.py     eval_v2 로그 → results/
+│   └── make_paper_figures.py    figures/ png/pdf
+├── Agent\ Management\ Navigation\
+├── latest\                      DT_Vessel 미러 (논문 출처 아님)
 └── runs\paper\
     ├── ckpts\final\             FINAL 39개 *.pt (지우지 말 것)
     ├── ckpts\steps\             중간 step*M
@@ -32,9 +32,7 @@ $C\
     ├── eval_v2\                 PRIMARY v2 재평가 로그
     ├── fig7\ mixed_fleet_rx.csv
     ├── fig8\ hub_s42_*.log
-    └── results\
-        ├── FIG1…FIG8\           학습 직후 FORMAL (보존)
-        └── v2\                  이 문서 · 표 · 그림
+    └── results\FIG1…FIG8\       학습 직후 FORMAL (보존)
 ```
 
 Python 학습/평가: `C:\Users\JYH\miniconda3\envs\vessel_repro\python.exe`  
@@ -250,7 +248,7 @@ THIN은 단일망과 파라미터를 맞춰 **전문화 vs 용량**을 분리한
 
 그림 생성: `Python/make_paper_figures.py`  
 스타일·개념도는 `reference/YHSH_VESSEL/paper_figures/{figstyle,schematics}.py`를 import.  
-출력: `$C/runs/paper/results/v2/figures/Fig{1–8}_*.png|pdf`  
+출력: `$C/figures/Fig{1–8}_*.png|pdf`  
 막대 오차막대는 넣지 않는다. Fig7만 시드 점.
 
 ---

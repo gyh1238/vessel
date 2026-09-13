@@ -4,9 +4,10 @@ import csv, re, statistics
 from collections import defaultdict
 from pathlib import Path
 
-PAPER = Path(__file__).resolve().parents[1] / "runs" / "paper"
+ROOT = Path(__file__).resolve().parents[1]
+PAPER = ROOT / "runs" / "paper"
 LOGD = PAPER / "eval_v2"
-OUTD = PAPER / "results" / "v2"
+OUTD = ROOT / "results"
 
 MAIN = re.compile(
     r"goal=\s*([\d.]+)%\s+vColl=\s*([\d.]+)%\s+oColl=\s*([\d.]+)%\s+TO=\s*([\d.]+)%"

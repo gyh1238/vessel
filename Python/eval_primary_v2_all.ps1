@@ -1,5 +1,5 @@
 # PRIMARY v2 + YHSH metrics re-eval for all Fig1-6 FINAL ckpts.
-# Does NOT overwrite eval/*.log or FIG*_FORMAL*.txt. Writes eval_v2/ and results/v2/.
+# Does NOT overwrite eval/*.log or FIG*_FORMAL*.txt. Writes eval_v2/ and repo results/.
 # Skips logs that already contain PRIMARY-v2-dominant.
 param(
   [int[]]$Gpus = @(0, 1, 2, 3)

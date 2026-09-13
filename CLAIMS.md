@@ -1,7 +1,7 @@
 # 논리적 주장 — common_freeze_v11 실측 기준
 
 작성: 2026-09-13  
-범위: Fig1–8. 수치는 `metrics.csv` / `FIG1.txt`–`FIG8.txt` (PRIMARY v2, 근접=미완 포함).  
+범위: Fig1–8. 수치는 `results/metrics.csv` / `results/FIG1.txt`–`FIG8.txt` (PRIMARY v2, 근접=미완 포함).  
 구현·태그·프로토콜은 [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 이 문서는 **무엇을 주장할 수 있는지**와 **주장하면 안 되는 문장**을 갈라 둔다. YHSH 납품 그림의 문장을 그대로 쓰지 않는다.

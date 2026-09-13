@@ -17,26 +17,52 @@ __pycache__/
 archive/
 repro/
 models/
+trajectory_data/
 
 # 중첩 git (깨진 worktree 포함) — 서브모듈로 넣지 않음
 **/.git
 
-# 캠페인 대용량 산출
-campaigns/**/ckpts/
-campaigns/**/eval/
-campaigns/**/eval_v2/
-campaigns/**/logs/
-campaigns/**/*.log
-campaigns/**/*.log.err
-campaigns/**/train_meta/*.csv
-campaigns/**/train_meta/*.heartbeat
-campaigns/**/runs/paper/*.pt
-campaigns/**/runs/archive/
+# 학습 산출 (가중치·로그). 논문 표·그림은 추적
+runs/**/ckpts/
+runs/**/eval/
+runs/**/eval_v2/
+runs/**/logs/
+Python/logs/
+*.log
+*.log.err
+runs/**/train_meta/*.csv
+runs/**/train_meta/*.heartbeat
+runs/paper/*.pt
+runs/archive/
+
+# 논문 표는 추적
+!results/*.csv
+!runs/paper/fig7/mixed_fleet_rx.csv
 
 # 최신 코드 미러의 옛 플롯 스크립트
-main/Python/_archive/
+latest/Python/_archive/
+
+# 로컬 노트 · Claude
+.claude/
+Python/analyze_mixed.py
+runs/smoke/
+**/개발 로그/
+**/개발 로그.meta
 
 # 에디터
 .cursor/
 .vscode/
 *.swp
+.DS_Store
+Thumbs.db
+
+# Unity 비자산 meta
+*.py.meta
+*.md.meta
+*.txt.meta
+*.sh.meta
+*.ps1.meta
+*.bat.meta
+*.tex.meta
+*.csv.meta
+*.log.meta
