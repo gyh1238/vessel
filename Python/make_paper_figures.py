@@ -131,10 +131,10 @@ def fig1(rows):
     fsx.panel_tag(ax, "(e)", dx=-0.14)
 
     fig.text(0.5, -0.035,
-             "Residual shared hub + Δμ L2, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
+             "v11 freeze, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
              "over ended + still-open voyages (not a crash rate among finished trips).\n"
              f"Typical goal-episode minSep ON {ms(on, 'minSep')[0]:.1f} m / OFF {ms(off, 'minSep')[0]:.1f} m.  "
-             "PRIMARY v2 C is near ceiling on both arms. Comm OFF is slightly better on arrival and proximity.",
+             "PRIMARY v2 C is near ceiling on both arms; communication wins arrival and proximity.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig1_Communication_necessity")
 
@@ -144,7 +144,7 @@ def fig2(rows):
         ("SINGLE", "q_MOE_SINGLE", C["base"]),
         ("THIN", "q_MOE_ISO", C["alt1"]),
         ("THICK", "base_comm", C["alt2"]),
-        ("SHARED", "qd_MOE_SE", C["proposed"]),
+        ("SHARED", "qd_MOE_SE_RL2", C["proposed"]),
     ]
     lab = ["Single\nnetwork", "Separate\nthin", "Separate\nfull", "Shared\n(proposed)"]
     col = [a[2] for a in arms]
@@ -227,13 +227,13 @@ def fig3(rows):
     c1, c4 = ms(n1, "C_v2")[0], ms(n4, "C_v2")[0]
     fig.text(0.5, -0.03,
              f"Arrival {g1:.1f}% -> {g4:.1f}%. PRIMARY v2 compliance {c1:.1f}% -> {c4:.1f}%.\n"
-             "Nearest-4 is residual+L2 hub; nearest-1 is v11 freeze (not retrained). Direction is the same: four neighbours beat one.",
+             "Four neighbours beat one on arrival and proximity; situation-wise compliance is already high on both.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig3_Multi_neighbour_aggregation")
 
 
 def fig4(rows):
-    order = [(2, "q_DIM2"), (4, "q_DIM4"), (6, "qd_MOE_SE"),
+    order = [(2, "q_DIM2"), (4, "q_DIM4"), (6, "qd_MOE_SE_RL2"),
              (8, "q_DIM8"), (10, "q_DIM10"), (12, "q_DIM12")]
     d = [x[0] for x in order]
     goal = [ms(pick(rows, p), "goal")[0] for _, p in order]
@@ -278,7 +278,7 @@ def fig4(rows):
 
 
 def fig5(rows):
-    off, on = pick(rows, "qo_SE_COLREGSOFF"), pick(rows, "qd_MOE_SE")
+    off, on = pick(rows, "qo_SE_COLREGSOFF"), pick(rows, "qd_MOE_SE_RL2")
     lab = ["COLREGs term\nOFF", "COLREGs term\nON"]
     col = [C["base"], C["proposed"]]
     fig = plt.figure(figsize=(11.0, 3.9))
@@ -313,7 +313,7 @@ def fig5(rows):
 
 
 def fig6(rows):
-    early, delay = pick(rows, "ql_SE_START"), pick(rows, "qd_MOE_SE")
+    early, delay = pick(rows, "ql_SE_START"), pick(rows, "qd_MOE_SE_RL2")
     lab = ["From start\n(0M)", "Delayed\n(9M)"]
     col = [C["base"], C["proposed"]]
     fig = plt.figure(figsize=(10.6, 3.9))

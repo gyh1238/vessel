@@ -29,6 +29,7 @@ ALIAS = {
 # condition -> (figure, arm_name)
 COND = {
     "qd_MOE_SE": ("hub", "shared_ON"),
+    "qd_MOE_SE_RL2": ("hub_rl2", "shared_ON"),
     "qf_SE_OFF": ("fig1", "OFF"),
     "q_MOE_SINGLE": ("fig2", "SINGLE"),
     "q_MOE_ISO": ("fig2", "THIN"),
@@ -65,13 +66,13 @@ def cond_of(tag: str):
     return fig, arm, int(seed), prefix
 
 
-# Residual+L2 proposed hub (v12r1) and matched arms overwrite v11 freeze logs of the same tag.
+# Residual+L2 proposed method overwrites Fig2 SHARED / Fig4 DIM6 / Fig5–6 delayed hub.
+# Fig1 stays v11 freeze ON vs OFF (communication necessity). Do not remap residual onto qf_SE_OFF.
 OVERLAY = (
     (PAPER / "v12r1" / "eval", {
-        "post_qd_MOE_SE_RL2": "qd_MOE_SE",
+        "post_qd_MOE_SE_RL2": "qd_MOE_SE_RL2",
     }),
     (PAPER / "v12r1_hub" / "eval", {
-        "post_qf_SE_OFF_RL2": "qf_SE_OFF",
         "post_q_DIM8_RL2": "q_DIM8",
         "post_q_DIM10_RL2": "q_DIM10",
         "post_q_DIM12_RL2": "q_DIM12",
@@ -168,7 +169,12 @@ def overlay_logs():
             continue
         for p in sorted(folder.glob("*.log")):
             stem = p.stem
+            if stem in amap:
+                extra.append((p, amap[stem]))
+                continue
             for src, dst in amap.items():
+                if dst.endswith(("_s42", "_s43", "_s44")):
+                    continue
                 m = re.match(rf"^{re.escape(src)}_s(42|43|44)$", stem)
                 if m:
                     extra.append((p, f"{dst}_s{m.group(1)}"))
@@ -214,6 +220,8 @@ def main():
 
     hub = [r for r in rows if r["prefix"] == "qd_MOE_SE"]
     hub_mu = {k: statistics.mean([r[k] for r in hub]) for k in KEYS} if hub else {}
+    hub_rl2 = [r for r in rows if r["prefix"] == "qd_MOE_SE_RL2"]
+    hub_rl2_mu = {k: statistics.mean([r[k] for r in hub_rl2]) for k in KEYS} if hub_rl2 else {}
 
     def pick(*pairs):
         out = {}
@@ -225,14 +233,14 @@ def main():
               "Fig1 PRIMARY v2 + YHSH metrics (goal among ended; prox among ended+open)",
               pick(("ON (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
                    ("OFF", lambda r: r["prefix"] == "qf_SE_OFF")),
-              hub_mu, "goal=ended eps; prox=v-box overlap / (ended+open). Not labelled collision.")
+              hub_mu, "v11 freeze same-architecture ON vs trained OFF. Residual hub is Fig2/Fig4, not here.")
 
     write_fig(OUTD / "FIG2.txt", "Fig2 MoE structures PRIMARY v2 + YHSH metrics",
               pick(("SINGLE", lambda r: r["prefix"] == "q_MOE_SINGLE"),
-                   ("SHARED (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
+                   ("SHARED (hub)", lambda r: r["prefix"] == "qd_MOE_SE_RL2"),
                    ("THIN", lambda r: r["prefix"] == "q_MOE_ISO"),
                    ("THICK", lambda r: r["prefix"] == "base_comm")),
-              hub_mu)
+              hub_rl2_mu)
 
     write_fig(OUTD / "FIG3.txt", "Fig3 max_partners PRIMARY v2 + YHSH metrics",
               pick(("partners=4 (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
@@ -242,19 +250,19 @@ def main():
     fig4 = {}
     for d in (2, 4, 6, 8, 10, 12):
         name = "DIM6 (hub)" if d == 6 else f"DIM{d}"
-        pref = "qd_MOE_SE" if d == 6 else f"q_DIM{d}"
+        pref = "qd_MOE_SE_RL2" if d == 6 else f"q_DIM{d}"
         fig4[name] = [r for r in rows if r["prefix"] == pref]
-    write_fig(OUTD / "FIG4.txt", "Fig4 msg_dim PRIMARY v2 + YHSH metrics", fig4, hub_mu)
+    write_fig(OUTD / "FIG4.txt", "Fig4 msg_dim PRIMARY v2 + YHSH metrics", fig4, hub_rl2_mu)
 
     write_fig(OUTD / "FIG5.txt", "Fig5 COLREGS term PRIMARY v2 + YHSH metrics",
-              pick(("COLREGS on (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
+              pick(("COLREGS on (hub)", lambda r: r["prefix"] == "qd_MOE_SE_RL2"),
                    ("COLREGS off", lambda r: r["prefix"] == "qo_SE_COLREGSOFF")),
-              hub_mu)
+              hub_rl2_mu)
 
     write_fig(OUTD / "FIG6.txt", "Fig6 comm timing PRIMARY v2 + YHSH metrics",
-              pick(("comm @9M (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
+              pick(("comm @9M (hub)", lambda r: r["prefix"] == "qd_MOE_SE_RL2"),
                    ("comm @0 (early)", lambda r: r["prefix"] == "ql_SE_START")),
-              hub_mu)
+              hub_rl2_mu)
 
     # Fig7 from existing mixed_fleet_rx.csv (C = step-legacy, not PRIMARY v2).
     # YHSH Fig7: sample-weighted fleet of comm + nocomm groups per (n_rx, seed).
@@ -330,8 +338,9 @@ def main():
     summary = [
         f"v2 YHSH aggregate  logs={len(rows)} (expect ~39)",
         f"csv: {csv_path}",
-        f"hub goal={hub_mu.get('goal', float('nan')):.1f} prox={hub_mu.get('prox', float('nan')):.1f} "
-        f"C_v2={hub_mu.get('C_v2', float('nan')):.1f} fuel={hub_mu.get('fuel', float('nan')):.1f}",
+        f"hub(v11) goal={hub_mu.get('goal', float('nan')):.1f} prox={hub_mu.get('prox', float('nan')):.1f} "
+        f"C_v2={hub_mu.get('C_v2', float('nan')):.1f}  "
+        f"rl2 goal={hub_rl2_mu.get('goal', float('nan')):.1f} prox={hub_rl2_mu.get('prox', float('nan')):.1f}",
         "Fig7/Fig8: see FIG7/FIG8 notes - mixed/astar still use their own C unless re-eval ported.",
     ]
     (OUTD / "README.txt").write_text("\n".join(summary) + "\n", encoding="utf-8")
