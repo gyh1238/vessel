@@ -65,11 +65,31 @@ def cond_of(tag: str):
     return fig, arm, int(seed), prefix
 
 
-def parse_log(p: Path) -> dict | None:
+# Residual+L2 proposed hub (v12r1) and matched arms overwrite v11 freeze logs of the same tag.
+OVERLAY = (
+    (PAPER / "v12r1" / "eval", {
+        "post_qd_MOE_SE_RL2": "qd_MOE_SE",
+    }),
+    (PAPER / "v12r1_hub" / "eval", {
+        "post_qf_SE_OFF_RL2": "qf_SE_OFF",
+        "post_q_DIM8_RL2": "q_DIM8",
+        "post_q_DIM10_RL2": "q_DIM10",
+        "post_q_DIM12_RL2": "q_DIM12",
+    }),
+    (PAPER / "v12" / "eval", {
+        "post_q_MOE_SINGLE_B": "q_MOE_SINGLE",
+    }),
+    (PAPER / "v12r0" / "eval", {
+        "post_qd_MOE_SE_R0": "ql_SE_START",
+    }),
+)
+
+
+def parse_log(p: Path, force_tag: str | None = None) -> dict | None:
     text = p.read_text(encoding="utf-8", errors="replace")
     if "PRIMARY-v2-dominant" not in text:
         return None
-    tag = tag_of(p.stem)
+    tag = force_tag if force_tag else tag_of(p.stem)
     meta = cond_of(tag)
     if not meta:
         return None
@@ -141,6 +161,21 @@ def write_fig(path: Path, title: str, rows_by_arm: dict, hub_mu: dict | None, ex
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def overlay_logs():
+    extra = []
+    for folder, amap in OVERLAY:
+        if not folder.exists():
+            continue
+        for p in sorted(folder.glob("*.log")):
+            stem = p.stem
+            for src, dst in amap.items():
+                m = re.match(rf"^{re.escape(src)}_s(42|43|44)$", stem)
+                if m:
+                    extra.append((p, f"{dst}_s{m.group(1)}"))
+                    break
+    return extra
+
+
 def main():
     OUTD.mkdir(parents=True, exist_ok=True)
     rows = []
@@ -150,6 +185,10 @@ def main():
     parsed = []
     for p in logs:
         r = parse_log(p)
+        if r:
+            parsed.append(r)
+    for p, tag in overlay_logs():
+        r = parse_log(p, force_tag=tag)
         if r:
             parsed.append(r)
     by_tag = {}

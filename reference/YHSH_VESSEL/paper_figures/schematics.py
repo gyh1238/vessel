@@ -65,7 +65,7 @@ def architectures(ax):
 
     # 4) 공유 (제안)
     head(0.305, 'Shared perception (proposed)',
-         '512K  ·  one perception, five specialised decisions')
+         '370K  ·  shared trunk, residual Δμ per situation')
     ytop = 0.245
     yc = ytop - 2 * RS                     # 5행의 중앙
     _box(ax, x0, yc - 0.055, PW, 0.110, 'Shared\nRadarEncoder', '#cfe0ee',

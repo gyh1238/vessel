@@ -247,6 +247,15 @@ MOE_WIDTH = _env_float('VESSEL_MOE_WIDTH', 1.0)
 #   지각 용량 1/5 축소 — 실측 8.5M goal 3%)을 제거: 지각은 전체 데이터로 학습, 라우팅은 결정 계층만 특화.
 #   총 파라미터 ≈ 단일망 ×1.7 (5x의 ×5 대비). USE_MOE=1일 때만 유효, MOE_WIDTH=1.0과 함께 쓸 것.
 MOE_SHARED = _env_str('VESSEL_MOE_SHARED', '0') == '1'
+# ★공유 트렁크 (v12 파일럿): radar에 더해 fc2(+ Control/Critic msg_gate)까지 공유하고
+#   상황별은 maneuver head만. 기본 0 = v11 ckpt 비트동일. MOE_SHARED=1 일 때만 적용.
+MOE_SHARE_BACKBONE = _env_str('VESSEL_MOE_SHARE_BACKBONE', '0') == '1'
+# ★잔차 머리 (v12 3시드 실패 대응): 공유 정책(fc3·μ)은 모든 상황이 같이 배우고,
+#   상황별은 zero-init Δμ만. 희소 전문가가 항해 트렁크를 덮어쓰지 못하게 한다.
+#   기본 0. SHARE_BACKBONE과 같이 켠다. v11/v12 ckpt와 비호환 = from-scratch.
+MOE_RESIDUAL_HEAD = _env_str('VESSEL_MOE_RESIDUAL_HEAD', '0') == '1'
+# Δμ L2. 기본 0. s44가 통신 ON 이후 잔차가 커지며 항해를 깎는 것을 막기 위한 knob.
+MOE_DELTA_L2 = _env_float('VESSEL_MOE_DELTA_L2', 0.0)
 
 # ============================================================================
 # ★COLREGs situation 정책 입력 (2026-07-02 도입, 2026-07-03 기본 ON 승격): obs[368] 상황(0~4)을
@@ -359,6 +368,9 @@ def get_config_dict():
         'use_moe': USE_MOE,
         'moe_width': MOE_WIDTH,
         'moe_shared': MOE_SHARED,
+        'moe_share_backbone': MOE_SHARE_BACKBONE,
+        'moe_residual_head': MOE_RESIDUAL_HEAD,
+        'moe_delta_l2': MOE_DELTA_L2,
         'situation_input': SITUATION_INPUT,
         'num_colregs_situations': NUM_COLREGS_SITUATIONS,
         'use_attention': USE_ATTENTION,

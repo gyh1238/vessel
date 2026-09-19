@@ -33,8 +33,8 @@ import schematics as sch
 SIT4 = ["Head-On", "Give-Way", "Overtaking", "Stand-On"]
 SIT_KEYS = ("sit1", "sit3", "sit4", "sit2")
 W_GOAL, W_PROX, W_TO = 1.5, 6.0, 0.5
-PARAMS = {  # YHSH measured counts; architecture unchanged
-    "SINGLE": 369131, "THIN": 363004, "THICK": 1826719, "SHARED": 511543,
+PARAMS = {  # measured counts; residual hub shares fc2–μ so ≈ single-net
+    "SINGLE": 369131, "THIN": 363004, "THICK": 1826719, "SHARED": 370037,
 }
 
 
@@ -93,6 +93,7 @@ def fig1(rows):
     off_g, on_g = ms(off, "goal"), ms(on, "goal")
     off_c, on_c = ms(off, "C_v2"), ms(on, "C_v2")
     dprox = pct(on_p[0], off_p[0])
+    prox_note = C["accent"] if dprox < 0 else C["mute"]
 
     fig = plt.figure(figsize=(11.0, 6.2))
     gs = GridSpec(2, 3, figure=fig, hspace=0.48, wspace=0.34)
@@ -102,7 +103,7 @@ def fig1(rows):
              ylabel="Proximity rate (%)", title="Proximity rate")
     ax.annotate(f"{dprox:+.0f}%", xy=(1, on_p[0]), xytext=(0, 22),
                 textcoords="offset points", ha="center", fontsize=9,
-                color=C["accent"], fontweight="bold")
+                color=prox_note, fontweight="bold")
     fsx.panel_tag(ax, "(a)", dx=-0.14)
 
     ax = fig.add_subplot(gs[0, 1])
@@ -130,10 +131,10 @@ def fig1(rows):
     fsx.panel_tag(ax, "(e)", dx=-0.14)
 
     fig.text(0.5, -0.035,
-             "v11 freeze, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
+             "Residual shared hub + Δμ L2, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
              "over ended + still-open voyages (not a crash rate among finished trips).\n"
              f"Typical goal-episode minSep ON {ms(on, 'minSep')[0]:.1f} m / OFF {ms(off, 'minSep')[0]:.1f} m.  "
-             "PRIMARY v2 compliance is near ceiling on both arms; communication wins arrival and proximity.",
+             "PRIMARY v2 C is near ceiling on both arms. Comm OFF is slightly better on arrival and proximity.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig1_Communication_necessity")
 
@@ -178,10 +179,9 @@ def fig2(rows):
     fsx.panel_tag(ax, "(d)")
 
     fig.text(0.5, -0.015,
-             "v11 3 seeds per arm. Single-network (no MoE) is best on arrival and proximity; "
-             "separate-full is worst. Shared hub sits in between.\n"
-             "This does not reproduce the YHSH story that shared MoE uniquely minimises crashes. "
-             "Capacity vs specialisation still favours not duplicating the radar encoder (thin/full).",
+             "Residual shared hub (fc2–μ shared, per-situation Δμ, Δμ L2) vs single / thin / full, 3 seeds. "
+             "Proposed hub wins arrival and proximity; parameter count matches the single network.\n"
+             "Thin and full still duplicate the radar encoder and lose. THIN/THICK bars are v11 freeze (not residual).",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig2_MoE_architecture")
 
@@ -227,7 +227,7 @@ def fig3(rows):
     c1, c4 = ms(n1, "C_v2")[0], ms(n4, "C_v2")[0]
     fig.text(0.5, -0.03,
              f"Arrival {g1:.1f}% -> {g4:.1f}%. PRIMARY v2 compliance {c1:.1f}% -> {c4:.1f}%.\n"
-             "Four neighbours beat one on arrival and proximity; situation-wise compliance is already high on both.",
+             "Nearest-4 is residual+L2 hub; nearest-1 is v11 freeze (not retrained). Direction is the same: four neighbours beat one.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig3_Multi_neighbour_aggregation")
 
@@ -269,9 +269,9 @@ def fig4(rows):
     for ax in axes[1]:
         ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
     fig.text(0.5, -0.02,
-             "v11 sweep is on the shared hub (DIM6 = qd_MOE_SE), 3 seeds averaged. "
-             "DIM6 is best on arrival and proximity; wider channels do not help.\n"
-             "PRIMARY v2 compliance is flat (~96%) across widths and is not a selection criterion.",
+             "DIM6/8/10/12 are residual+L2 shared hub, 3 seeds. DIM2/4 are v11 freeze (not residual).\n"
+             "DIM6 remains the selected width: wider channels do not consistently help. "
+             "PRIMARY v2 C is flat and is not a selection criterion.",
              ha="center", fontsize=8.0, color=C["mute"])
     fig.tight_layout()
     fsx.save(fig, str(OUT), "Fig4_Message_dimensionality")
@@ -304,10 +304,10 @@ def fig5(rows):
     fsx.panel_tag(ax, "(c)")
 
     fig.text(0.5, -0.10,
-             "3 seeds. The COLREGs term raises PRIMARY v2 compliance (sit2/sit3 especially) "
+             "3 seeds. The COLREGs term raises PRIMARY v2 C (sit2/sit3 especially) "
              "and is the only ablation that moves C off the ceiling.\n"
-             "Proximity is not improved by the term (OFF can look safer while violating stand-on/give-way). "
-             "Pick training by C here, not by proximity.",
+             "ON is residual+L2 hub; OFF is v11 freeze without the term. "
+             "Arrival and proximity are now essentially tied; pick training by C here, not by proximity.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig5_COLREGs_shaping")
 
@@ -341,9 +341,8 @@ def fig6(rows):
     fsx.panel_tag(ax, "(c)", dx=-0.16)
 
     fig.text(0.5, -0.11,
-             "Both arms train 16M decisions; only the message-on time differs. "
-             "Delayed (9M, hub) wins arrival and proximity; PRIMARY v2 C is tied.\n"
-             "v11 does not reproduce a from-start rushing collapse on arrival.",
+             "Delayed (9M) is residual+L2 hub. From-start is residual comm@0 without Δμ L2 (not a pure timing ablation).\n"
+             "Delayed wins arrival and proximity; PRIMARY v2 C is tied. No from-start rushing collapse on arrival.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig6_Communication_timing")
 
@@ -490,7 +489,7 @@ def main():
     fsx.apply()
     OUT.mkdir(parents=True, exist_ok=True)
     rows = load_rows()
-    want = [int(a) for a in sys.argv[1:]] or list(FIGS)
+    want = [int(a) for a in sys.argv[1:]] or [1, 2, 3, 4, 5, 6, 7]
     for n in want:
         print(f"Fig{n} ...")
         FIGS[n](rows)

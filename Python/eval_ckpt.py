@@ -119,12 +119,17 @@ def main():
             net.USE_MOE = bool(_snap.get('use_moe'))
         if 'moe_shared' in _snap:
             net.MOE_SHARED = bool(_snap.get('moe_shared'))
+        if 'moe_share_backbone' in _snap:
+            net.MOE_SHARE_BACKBONE = bool(_snap.get('moe_share_backbone'))
+        if 'moe_residual_head' in _snap:
+            net.MOE_RESIDUAL_HEAD = bool(_snap.get('moe_residual_head'))
         if 'moe_width' in _snap:
             net.MOE_WIDTH = float(_snap.get('moe_width'))
         print(f"[eval] ckpt 설정 적용: attention={net.USE_ATTENTION} pos_ground={net.POS_GROUND} "
               f"central_critic={net.CENTRAL_CRITIC} state_recon={net.STATE_RECON_COEF} "
-              f"moe={net.USE_MOE} shared={net.MOE_SHARED} width={net.MOE_WIDTH} "
-              f"msg_dim={_msg_dim}", flush=True)
+              f"moe={net.USE_MOE} shared={net.MOE_SHARED} share_backbone={net.MOE_SHARE_BACKBONE} "
+              f"residual_head={getattr(net, 'MOE_RESIDUAL_HEAD', False)} "
+              f"width={net.MOE_WIDTH} msg_dim={_msg_dim}", flush=True)
         # 학습 arm 과 평가 arm 이 어긋나면 다른 실험을 재는 것이므로 즉시 실패시킨다.
         _ck_arm = _snap.get('arm') or (sd.get('arm') if isinstance(sd, dict) else None)
         if _ck_arm and _ck_arm != args.arm and not args.allow_arm_mismatch:

@@ -27,7 +27,8 @@ from config import (STATE_SIZE, RADAR_FEAT_DIM, USE_COMMUNICATION,
                     INTENT_COEF, INTENT_K, THREAT_COEF, THREAT_K, GOAL_COMM_COEF,
                     ROLE_COMM_COEF, USE_MOE, NUM_COLREGS_SITUATIONS, MAX_COMM_PARTNERS,
                     COMM_CONSUMER_COEF, COMM_CONSUMER_K, COMM_CONSUMER_COUPLING, USE_ORACLE,
-                    SITUATION_INPUT, MOE_WIDTH, MOE_SHARED, POS_GROUND, STATE_RECON_COEF,
+                    SITUATION_INPUT, MOE_WIDTH, MOE_SHARED, MOE_SHARE_BACKBONE,
+                    MOE_RESIDUAL_HEAD, POS_GROUND, STATE_RECON_COEF,
                     CENTRAL_CRITIC)
 
 
@@ -40,6 +41,61 @@ def _share_radar_encoder(experts):
     parameters()/optimizer는 공유 텐서를 자동 dedup, state_dict는 5벌 동일 사본 저장(load 호환)."""
     for _k in range(1, len(experts)):
         experts[_k].radar_encoder = experts[0].radar_encoder
+
+
+def _share_attr(experts, name):
+    src = getattr(experts[0], name)
+    for _k in range(1, len(experts)):
+        setattr(experts[_k], name, src)
+
+
+def _copy_heads(experts, module_names, param_names=()):
+    """expert 1–4 head를 expert 0 가중치로 복사(모듈은 별개). 시작점은 공유 정책."""
+    src = experts[0]
+    for _k in range(1, len(experts)):
+        dst = experts[_k]
+        for name in module_names:
+            getattr(dst, name).load_state_dict(getattr(src, name).state_dict())
+        for name in param_names:
+            getattr(dst, name).data.copy_(getattr(src, name).data)
+
+
+def _apply_shared_moe(experts, kind):
+    """MOE_SHARED: radar 공유. SHARE_BACKBONE: fc2(+gate) 공유 후 head 복사.
+    RESIDUAL_HEAD: fc3·action_mean까지 공유하고 상황별은 zero-init action_delta만.
+    kind: 'msg' | 'ctrl' | 'critic'."""
+    if not MOE_SHARED:
+        return
+    _share_radar_encoder(experts)
+    if not (MOE_SHARE_BACKBONE or MOE_RESIDUAL_HEAD):
+        return
+    _share_attr(experts, 'fc2')
+    if kind == 'msg':
+        if getattr(experts[0], 'msg_ln', None) is not None:
+            _share_attr(experts, 'msg_ln')
+        if MOE_RESIDUAL_HEAD:
+            _share_attr(experts, 'msg_out')
+        else:
+            _copy_heads(experts, ('msg_out',))
+    elif kind == 'ctrl':
+        _share_attr(experts, 'msg_gate')
+        if MOE_RESIDUAL_HEAD:
+            _share_attr(experts, 'fc3')
+            _share_attr(experts, 'consumer_decoder')
+            _share_attr(experts, 'action_mean')
+            _share_attr(experts, 'action_logstd')
+        else:
+            _copy_heads(experts, ('fc3', 'action_mean', 'consumer_decoder'), ('action_logstd',))
+    elif kind == 'critic':
+        _share_attr(experts, 'msg_gate')
+        if getattr(experts[0], 'glob_enc', None) is not None:
+            _share_attr(experts, 'glob_enc')
+        if MOE_RESIDUAL_HEAD:
+            _share_attr(experts, 'value_out')
+        else:
+            _copy_heads(experts, ('value_out',))
+    else:
+        raise ValueError('kind must be msg|ctrl|critic')
 
 
 def _w(n, width, floor=4):
@@ -422,7 +478,7 @@ class MessageActor(nn.Module):
             self.experts = nn.ModuleList(
                 [_MessageActorCore(frames, msg_dim, MOE_WIDTH) for _ in range(self.num_experts)])
             if MOE_SHARED:
-                _share_radar_encoder(self.experts)
+                _apply_shared_moe(self.experts, 'msg')
         else:
             self.core = _MessageActorCore(frames, msg_dim)
 
@@ -502,6 +558,12 @@ class _ControlActorCore(nn.Module):
         self.action_mean = nn.Linear(_fc3_h, action_size)
         self.action_mean.weight.data.mul_(0.1)
         self.action_mean.bias.data.zero_()
+        # Residual COLREGS Δμ: zero at init so every situation starts as the shared policy.
+        self.action_delta = None
+        if MOE_RESIDUAL_HEAD:
+            self.action_delta = nn.Linear(_fc3_h, action_size)
+            nn.init.zeros_(self.action_delta.weight)
+            nn.init.zeros_(self.action_delta.bias)
         # Learnable log std — per-dim: rudder(dim0) -1.0(std≈0.37), thrust(dim1) -0.5(std≈0.61).
         if action_size == 2:
             self.action_logstd = nn.Parameter(torch.tensor([[-1.0, -0.5]]))
@@ -528,6 +590,8 @@ class _ControlActorCore(nn.Module):
         zc = torch.cat([z, dec], dim=-1) if dec is not None else z
         a = torch.tanh(self.fc3(zc))
         mean = self.action_mean(a)
+        if self.action_delta is not None:
+            mean = mean + self.action_delta(a)
         logstd = self.action_logstd.expand(z.shape[0], -1)
         return mean, logstd, dec
 
@@ -553,7 +617,7 @@ class ControlActor(nn.Module):
             self.experts = nn.ModuleList(
                 [_ControlActorCore(frames, msg_dim, action_size, MOE_WIDTH) for _ in range(self.num_experts)])
             if MOE_SHARED:
-                _share_radar_encoder(self.experts)
+                _apply_shared_moe(self.experts, 'ctrl')
         else:
             self.core = _ControlActorCore(frames, msg_dim, action_size)
         self.core_hidden = (self.experts[0] if self.use_moe else self.core).hidden
@@ -563,6 +627,23 @@ class ControlActor(nn.Module):
 
     def cores(self):
         return list(self.experts) if self.use_moe else [self.core]
+
+    def delta_l2(self):
+        """Residual Δμ L2 (0 if no deltas)."""
+        if not MOE_RESIDUAL_HEAD:
+            ref = (self.experts[0] if self.use_moe else self.core).fc2.weight
+            return ref.new_zeros(())
+        acc = None
+        for e in self.cores():
+            d = getattr(e, 'action_delta', None)
+            if d is None:
+                continue
+            term = d.weight.pow(2).sum() + d.bias.pow(2).sum()
+            acc = term if acc is None else acc + term
+        if acc is None:
+            ref = (self.experts[0] if self.use_moe else self.core).fc2.weight
+            return ref.new_zeros(())
+        return acc
 
     def mean_gate_sigmoid(self):
         cs = self.cores()
@@ -758,7 +839,7 @@ class Critic(nn.Module):
             self.experts = nn.ModuleList(
                 [_CriticCore(frames, msg_dim, MOE_WIDTH) for _ in range(self.num_experts)])
             if MOE_SHARED:
-                _share_radar_encoder(self.experts)
+                _apply_shared_moe(self.experts, 'critic')
         else:
             self.core = _CriticCore(frames, msg_dim)
 

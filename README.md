@@ -7,11 +7,11 @@ GitHub `main`은 **paper freeze v11** 입니다. 학습 가중치(`*.pt`)는 올
 ```
 vessel/
 ├── README.md
-├── DISCUSSION.md         공저자 토론 (개념도 + Fig1–8)
+├── DISCUSSION.md         공저자 토론 (개념도 + Fig1–7)
 ├── CLAIMS.md             쓸 수 있는 주장
 ├── IMPLEMENTATION.md     freeze · 그림별 플래그
 ├── ARCHITECTURE.md       관측·신경망 구조
-├── figures/              Fig1–8 png/pdf
+├── figures/              Fig1–7 png/pdf (Fig8 전역경로는 논문에서 제외)
 ├── results/              FIG*.txt, metrics.csv
 ├── Python/               학습·평가
 ├── Agent/                Unity 선박
@@ -26,11 +26,11 @@ vessel/
 | 쓸 수 있는 주장 | [CLAIMS.md](CLAIMS.md) |
 | freeze · 그림별 플래그 | [IMPLEMENTATION.md](IMPLEMENTATION.md) |
 | 신경망 구조 | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Fig1–8 파일 | [figures/](figures/) |
+| Fig1–7 파일 | [figures/](figures/) |
 | 표 | [results/](results/) |
 | 학습·평가 | `Python/` |
 
-hub (통신 ON, 공유 MoE, 이웃 4, DIM6, COLREGS on, 통신 @9M): **goal 93.7 · prox 2.4 · C_v2 95.9**
+hub (통신 ON, 공유 residual MoE, 이웃 4, DIM6, COLREGS on, 통신 @9M, Δμ L2): **goal 95.3 · prox 1.7 · C_v2 94.6**
 
 ## Figures (PRIMARY v2)
 
@@ -47,5 +47,3 @@ hub (통신 ON, 공유 MoE, 이웃 4, DIM6, COLREGS on, 통신 @9M): **goal 93.7
 ![Fig6 Communication timing](figures/Fig6_Communication_timing.png)
 
 ![Fig7 Heterogeneous fleet](figures/Fig7_Heterogeneous_fleet.png)
-
-![Fig8 Global path](figures/Fig8_Global_path.png)

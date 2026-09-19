@@ -502,7 +502,10 @@ def main():
             'arm': args.arm, 'msg_dim': MSG_DIM,
             'use_attention': bool(cfg.USE_ATTENTION), 'pos_ground': bool(cfg.POS_GROUND),
             'central_critic': bool(cfg.CENTRAL_CRITIC), 'state_recon_coef': float(cfg.STATE_RECON_COEF),
-            'use_moe': bool(cfg.USE_MOE), 'moe_shared': bool(cfg.MOE_SHARED), 'moe_width': float(cfg.MOE_WIDTH),
+            'use_moe': bool(cfg.USE_MOE), 'moe_shared': bool(cfg.MOE_SHARED),
+            'moe_share_backbone': bool(cfg.MOE_SHARE_BACKBONE),
+            'moe_residual_head': bool(cfg.MOE_RESIDUAL_HEAD),
+            'moe_delta_l2': float(cfg.MOE_DELTA_L2), 'moe_width': float(cfg.MOE_WIDTH),
             'msg_ln': os.environ.get('VESSEL_MSG_LN', '1') == '1',
             'comm_range': float(cfg.COMM_RANGE), 'max_partners': int(args.max_partners),
             'comm_on_at': int(args.comm_on_at), 'ring': float(args.ring), 'crossing': int(args.crossing),
@@ -730,6 +733,8 @@ def main():
                     pg2 = torch.clamp(ratio, 1 - cfg.EPSILON, 1 + cfg.EPSILON) * a_mb
                     policy_loss = -torch.min(pg1, pg2).mean()
                     value_loss = ((value_new - fret[mi]) ** 2).mean()
+                    if cfg.MOE_DELTA_L2 > 0.0 and getattr(cfg, 'MOE_RESIDUAL_HEAD', False):
+                        aux = aux + cfg.MOE_DELTA_L2 * policy.ctr_actor.delta_l2()
                     loss = policy_loss + cfg.CRITIC_LOSS_WEIGHT * value_loss - cfg.ENTROPY_BONUS * entropy + aux
                     opt.zero_grad()
                     loss.backward()
