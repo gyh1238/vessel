@@ -1,4 +1,4 @@
-"""v11 paper figures in the YHSH layout. Numbers come from eval_v2 (PRIMARY v2).
+"""v12mix paper figures in the YHSH layout. Numbers from results/metrics.csv (PRIMARY v2).
 
 Proximity (not 'collision'): ship-box overlap episodes / (ended + window-open).
 Arrival/goal stays among ended episodes (TO=0 in this protocol).
@@ -33,8 +33,9 @@ import schematics as sch
 SIT4 = ["Head-On", "Give-Way", "Overtaking", "Stand-On"]
 SIT_KEYS = ("sit1", "sit3", "sit4", "sit2")
 W_GOAL, W_PROX, W_TO = 1.5, 6.0, 0.5
-PARAMS = {  # measured counts; residual hub shares fc2–μ so ≈ single-net
-    "SINGLE": 369131, "THIN": 363004, "THICK": 1826719, "SHARED": 370037,
+# Measured state-dict numel from v12mix / v12mix_hub ckpts (s42).
+PARAMS = {
+    "SINGLE": 369771, "THIN": 368190, "THICK": 902415, "SHARED": 902415,
 }
 
 
@@ -131,7 +132,7 @@ def fig1(rows):
     fsx.panel_tag(ax, "(e)", dx=-0.14)
 
     fig.text(0.5, -0.035,
-             "v11 freeze, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
+             "v12mix freeze, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
              "over ended + still-open voyages (not a crash rate among finished trips).\n"
              f"Typical goal-episode minSep ON {ms(on, 'minSep')[0]:.1f} m / OFF {ms(off, 'minSep')[0]:.1f} m.  "
              "PRIMARY v2 C is near ceiling on both arms; communication wins arrival and proximity.",
@@ -144,7 +145,7 @@ def fig2(rows):
         ("SINGLE", "q_MOE_SINGLE", C["base"]),
         ("THIN", "q_MOE_ISO", C["alt1"]),
         ("THICK", "base_comm", C["alt2"]),
-        ("SHARED", "qd_MOE_SE_RL2", C["proposed"]),
+        ("SHARED", "qd_MOE_SE", C["proposed"]),
     ]
     lab = ["Single\nnetwork", "Separate\nthin", "Separate\nfull", "Shared\n(proposed)"]
     col = [a[2] for a in arms]
@@ -179,9 +180,9 @@ def fig2(rows):
     fsx.panel_tag(ax, "(d)")
 
     fig.text(0.5, -0.015,
-             "Residual shared hub (fc2–μ shared, per-situation Δμ, Δμ L2) vs single / thin / full, 3 seeds. "
-             "Proposed hub wins arrival and proximity; parameter count matches the single network.\n"
-             "Thin and full still duplicate the radar encoder and lose. THIN/THICK bars are v11 freeze (not residual).",
+             "v12mix: shared MoE (shared eye/backbone, situation steering heads, train soft route-mix=0.15) "
+             "vs single / separate-thin / separate-full, 3 seeds.\n"
+             "SHARED ≥ SINGLE on arrival and proximity; THIN/THICK (separate encoders) lose. Not residual Δμ.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig2_MoE_architecture")
 
@@ -233,24 +234,21 @@ def fig3(rows):
 
 
 def fig4(rows):
-    order = [(2, "q_DIM2"), (4, "q_DIM4"), (6, "qd_MOE_SE_RL2"),
-             (8, "q_DIM8"), (10, "q_DIM10"), (12, "q_DIM12")]
+    order = [(6, "qd_MOE_SE"), (8, "q_DIM8"), (10, "q_DIM10"), (12, "q_DIM12")]
     d = [x[0] for x in order]
     goal = [ms(pick(rows, p), "goal")[0] for _, p in order]
     prox = [ms(pick(rows, p), "prox")[0] for _, p in order]
-    cre = [ms(pick(rows, p), "C_v2")[0] for _, p in order]
     sco = [score_row(r) for _, p in order for r in [ {**{"goal": ms(pick(rows, p), "goal")[0],
                                                          "prox": ms(pick(rows, p), "prox")[0],
                                                          "TO": 0.0}} ]]
 
     panels = [("(a)", goal, "Arrival rate (%)", "Arrival rate", False),
               ("(b)", prox, "Proximity rate (%)", "Proximity rate", True),
-              ("(c)", cre, "Compliance (%)", "COLREGs PRIMARY v2", False),
-              ("(d)", sco, "Outcome score", "Outcome score (1.5 goal - 6 prox)", False)]
+              ("(c)", sco, "Outcome score", "Outcome score (1.5 goal - 6 prox)", False)]
 
-    fig, axes = plt.subplots(2, 2, figsize=(9.2, 6.0), sharex=True)
-    for ax, (tag, y, ylab, title, lower_better) in zip(axes.ravel(), panels):
-        ax.axvspan(6, 8, color=C["proposed"], alpha=0.07, lw=0, zorder=0)
+    fig, axes = plt.subplots(1, 3, figsize=(11.0, 3.6), sharex=True)
+    for ax, (tag, y, ylab, title, lower_better) in zip(axes, panels):
+        ax.axvspan(5.5, 6.5, color=C["proposed"], alpha=0.07, lw=0, zorder=0)
         ax.plot(d, y, marker="o", ms=5, lw=1.5, color=C["proposed"],
                 mfc="white", mec=C["proposed"], mew=1.4, zorder=3)
         for xi, yi in zip(d, y):
@@ -262,23 +260,21 @@ def fig4(rows):
         span = max(hi - lo, 0.2)
         ax.set_ylim(lo - span * 0.30, hi + span * 0.35)
         ax.set_xticks(d)
+        ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
         fsx.panel_tag(ax, tag)
         if lower_better:
             ax.annotate("lower is better", (0.98, 0.94), xycoords="axes fraction",
                         ha="right", fontsize=7.2, color=C["mute"])
-    for ax in axes[1]:
-        ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
-    fig.text(0.5, -0.02,
-             "DIM6/8/10/12 are residual+L2 shared hub, 3 seeds. DIM2/4 are v11 freeze (not residual).\n"
-             "DIM6 remains the selected width: wider channels do not consistently help. "
-             "PRIMARY v2 C is flat and is not a selection criterion.",
+    fig.text(0.5, -0.08,
+             "DIM6/8/10/12 on v12mix shared MoE (soft route-mix), 3 seeds.\n"
+             "DIM6 remains the selected width: wider channels do not help.",
              ha="center", fontsize=8.0, color=C["mute"])
     fig.tight_layout()
     fsx.save(fig, str(OUT), "Fig4_Message_dimensionality")
 
 
 def fig5(rows):
-    off, on = pick(rows, "qo_SE_COLREGSOFF"), pick(rows, "qd_MOE_SE_RL2")
+    off, on = pick(rows, "qo_SE_COLREGSOFF"), pick(rows, "qd_MOE_SE")
     lab = ["COLREGs term\nOFF", "COLREGs term\nON"]
     col = [C["base"], C["proposed"]]
     fig = plt.figure(figsize=(11.0, 3.9))
@@ -304,16 +300,15 @@ def fig5(rows):
     fsx.panel_tag(ax, "(c)")
 
     fig.text(0.5, -0.10,
-             "3 seeds. The COLREGs term raises PRIMARY v2 C (sit2/sit3 especially) "
-             "and is the only ablation that moves C off the ceiling.\n"
-             "ON is residual+L2 hub; OFF is v11 freeze without the term. "
-             "Arrival and proximity are now essentially tied; pick training by C here, not by proximity.",
+             "v12mix, 3 seeds. The COLREGs term raises PRIMARY v2 C and is the only ablation that "
+             "moves C off the ceiling.\n"
+             "Arrival and proximity stay similar; use C for this axis, not proximity alone.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig5_COLREGs_shaping")
 
 
 def fig6(rows):
-    early, delay = pick(rows, "ql_SE_START"), pick(rows, "qd_MOE_SE_RL2")
+    early, delay = pick(rows, "ql_SE_START"), pick(rows, "qd_MOE_SE")
     lab = ["From start\n(0M)", "Delayed\n(9M)"]
     col = [C["base"], C["proposed"]]
     fig = plt.figure(figsize=(10.6, 3.9))
@@ -341,14 +336,16 @@ def fig6(rows):
     fsx.panel_tag(ax, "(c)", dx=-0.16)
 
     fig.text(0.5, -0.11,
-             "Delayed (9M) is residual+L2 hub. From-start is residual comm@0 without Δμ L2 (not a pure timing ablation).\n"
-             "Delayed wins arrival and proximity; PRIMARY v2 C is tied. No from-start rushing collapse on arrival.",
+             "v12mix shared MoE. Delayed (9M) vs from-start (comm_on_at=0), 3 seeds.\n"
+             "Delayed wins arrival and proximity; PRIMARY v2 C is near ceiling on both.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig6_Communication_timing")
 
 
 def _load_mixed():
-    path = PAPER / "fig7" / "mixed_fleet_rx.csv"
+    path = PAPER / "v12mix_hub" / "fig7" / "mixed_fleet_rx.csv"
+    if not path.exists():
+        path = PAPER / "fig7" / "mixed_fleet_rx.csv"
     if not path.exists():
         return None
     by = {}
@@ -416,7 +413,7 @@ def fig7(_rows):
         sec.set_xlabel("Tx-capable vessels", fontsize=8.0, labelpad=2)
 
     fig.text(0.5, -0.035,
-             f"v11 mixed-fleet CSV, {len(seeds)} seeds, sample-weighted fleet. "
+             f"v12mix hub mixed-fleet CSV, {len(seeds)} seeds, sample-weighted fleet. "
              "Panel (b) is the CSV proximity/overlap rate (not PRIMARY v2). "
              "Panel (c) is still step-legacy C.\n"
              "Grey dots are individual seeds.",

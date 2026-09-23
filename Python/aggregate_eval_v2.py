@@ -17,32 +17,80 @@ MAIN = re.compile(
     r"\s+sit3=\s*([\d.]+)%\(n=(\d+)\)\s+sit4=\s*([\d.]+)%\(n=(\d+)\)"
 )
 V11 = re.compile(r"\[COLREGs PRIMARY-v11\].*?C=\s*([\d.]+)%")
+CDOM = re.compile(r"\[COLREGs PRIMARY-v2-dominant\] C=\s*([\d.]+)%")
+SITDOM = re.compile(
+    r"\[COLREGs PRIMARY-v2-dominant\].*?"
+    r"sit1=\s*([\d.]+)%\(n=\d+\)\s+sit2=\s*([\d.]+)%\(n=\d+\)\s+"
+    r"sit3=\s*([\d.]+)%\(n=\d+\)\s+sit4=\s*([\d.]+)%\(n=\d+\)"
+)
 CENS = re.compile(r"\[censored\].*?(\d+)")
 NEPS = re.compile(r"\|\s*(\d+)\s+eps")
 ALLMIN = re.compile(r"allMinSep=\s*([\d.]+)m")
-ALIAS = {
-    "ON_s42": "qd_MOE_SE_s42", "ON_s43": "qd_MOE_SE_s43", "ON_s44": "qd_MOE_SE_s44",
-    "OFF_s42": "qf_SE_OFF_s42", "OFF_s43": "qf_SE_OFF_s43", "OFF_s44": "qf_SE_OFF_s44",
-    "SINGLE_s42": "q_MOE_SINGLE_s42",
-}
+ALIAS = {}
 
 # condition -> (figure, arm_name)
 COND = {
     "qd_MOE_SE": ("hub", "shared_ON"),
-    "qd_MOE_SE_RL2": ("hub_rl2", "shared_ON"),
+    "qd_MOE_SE_MX": ("hub", "shared_ON"),
     "qf_SE_OFF": ("fig1", "OFF"),
+    "qf_SE_OFF_MX": ("fig1", "OFF"),
     "q_MOE_SINGLE": ("fig2", "SINGLE"),
+    "q_MOE_SINGLE_MX": ("fig2", "SINGLE"),
     "q_MOE_ISO": ("fig2", "THIN"),
+    "q_MOE_THIN_MX": ("fig2", "THIN"),
     "base_comm": ("fig2", "THICK"),
+    "q_MOE_THICK_MX": ("fig2", "THICK"),
     "qf_SE_NEAR1": ("fig3", "NEAR1"),
+    "qf_SE_NEAR1_MX": ("fig3", "NEAR1"),
     "q_DIM2": ("fig4", "DIM2"),
     "q_DIM4": ("fig4", "DIM4"),
     "q_DIM8": ("fig4", "DIM8"),
+    "q_DIM8_MX": ("fig4", "DIM8"),
     "q_DIM10": ("fig4", "DIM10"),
+    "q_DIM10_MX": ("fig4", "DIM10"),
     "q_DIM12": ("fig4", "DIM12"),
+    "q_DIM12_MX": ("fig4", "DIM12"),
     "qo_SE_COLREGSOFF": ("fig5", "COLREGSOFF"),
+    "qo_SE_COLREGSOFF_MX": ("fig5", "COLREGSOFF"),
     "ql_SE_START": ("fig6", "EARLY"),
+    "qo_SE_COMM0_MX": ("fig6", "EARLY"),
 }
+
+# Canonical prefixes written into metrics.csv (make_paper_figures keys).
+CANON = {
+    "qd_MOE_SE_MX": "qd_MOE_SE",
+    "qf_SE_OFF_MX": "qf_SE_OFF",
+    "q_MOE_SINGLE_MX": "q_MOE_SINGLE",
+    "q_MOE_THIN_MX": "q_MOE_ISO",
+    "q_MOE_THICK_MX": "base_comm",
+    "qf_SE_NEAR1_MX": "qf_SE_NEAR1",
+    "q_DIM8_MX": "q_DIM8",
+    "q_DIM10_MX": "q_DIM10",
+    "q_DIM12_MX": "q_DIM12",
+    "qo_SE_COLREGSOFF_MX": "qo_SE_COLREGSOFF",
+    "qo_SE_COMM0_MX": "ql_SE_START",
+}
+
+# v12mix hub overlay: remap post_* logs onto canonical tags.
+OVERLAY = (
+    (PAPER / "v12mix" / "eval", {
+        "post_qd_MOE_SE_MX": "qd_MOE_SE",
+        "post_q_MOE_SINGLE_MX": "q_MOE_SINGLE",
+    }),
+    (PAPER / "v12mix_hub" / "eval", {
+        "post_qd_MOE_SE_MX": "qd_MOE_SE",
+        "post_qf_SE_OFF_MX": "qf_SE_OFF",
+        "post_qf_SE_NEAR1_MX": "qf_SE_NEAR1",
+        "post_qo_SE_COLREGSOFF_MX": "qo_SE_COLREGSOFF",
+        "post_qo_SE_COMM0_MX": "ql_SE_START",
+        "post_q_DIM8_MX": "q_DIM8",
+        "post_q_DIM10_MX": "q_DIM10",
+        "post_q_DIM12_MX": "q_DIM12",
+        "post_q_MOE_THIN_MX": "q_MOE_ISO",
+        "post_q_MOE_THICK_MX": "base_comm",
+    }),
+)
+
 
 KEYS = ["goal", "vColl", "oColl", "prox", "n_fin", "n_open", "TO", "C_v2", "C_v11",
         "sit1", "sit2", "sit3", "sit4", "fuel", "headTravel", "minSep", "allMinSep", "len"]
@@ -53,9 +101,6 @@ def tag_of(stem: str) -> str:
 
 
 def cond_of(tag: str):
-    seed = tag.rsplit("_s", 1)[-1]
-    prefix = tag[: -(len(seed) + 2)] if tag.endswith(tuple(f"_s{s}" for s in (42, 43, 44))) else tag
-    # q_DIM10_s42 -> prefix q_DIM10
     m = re.match(r"^(.*)_s(42|43|44)$", tag)
     if not m:
         return None
@@ -64,26 +109,6 @@ def cond_of(tag: str):
         return None
     fig, arm = COND[prefix]
     return fig, arm, int(seed), prefix
-
-
-# Residual+L2 proposed method overwrites Fig2 SHARED / Fig4 DIM6 / Fig5–6 delayed hub.
-# Fig1 stays v11 freeze ON vs OFF (communication necessity). Do not remap residual onto qf_SE_OFF.
-OVERLAY = (
-    (PAPER / "v12r1" / "eval", {
-        "post_qd_MOE_SE_RL2": "qd_MOE_SE_RL2",
-    }),
-    (PAPER / "v12r1_hub" / "eval", {
-        "post_q_DIM8_RL2": "q_DIM8",
-        "post_q_DIM10_RL2": "q_DIM10",
-        "post_q_DIM12_RL2": "q_DIM12",
-    }),
-    (PAPER / "v12" / "eval", {
-        "post_q_MOE_SINGLE_B": "q_MOE_SINGLE",
-    }),
-    (PAPER / "v12r0" / "eval", {
-        "post_qd_MOE_SE_R0": "ql_SE_START",
-    }),
-)
 
 
 def parse_log(p: Path, force_tag: str | None = None) -> dict | None:
@@ -119,6 +144,16 @@ def parse_log(p: Path, force_tag: str | None = None) -> dict | None:
         "C_v11": float(v11.group(1)) if v11 else float("nan"),
         "allMinSep": float(ALLMIN.search(text).group(1)) if ALLMIN.search(text) else float("nan"),
     }
+    # Prefer PRIMARY-v2-dominant C/sit (ceiling-aware panel metric used in CLAIMS).
+    cdom = CDOM.search(text)
+    if cdom:
+        row["C_v2"] = float(cdom.group(1))
+    sitdom = SITDOM.search(text)
+    if sitdom:
+        row["sit1"] = float(sitdom.group(1))
+        row["sit2"] = float(sitdom.group(2))
+        row["sit3"] = float(sitdom.group(3))
+        row["sit4"] = float(sitdom.group(4))
     # 근접: 선박 박스 겹침으로 끊긴 항해 / (종료 + 창끝 미완). 종료만 모으면 ~6-10%로 부풀어 보임.
     row["prox"] = (vcoll / 100.0 * n_fin) / denom * 100.0 if denom == denom else vcoll
     return row
@@ -184,29 +219,13 @@ def overlay_logs():
 
 def main():
     OUTD.mkdir(parents=True, exist_ok=True)
-    rows = []
-    seen = set()
-    logs = sorted(LOGD.glob("*.log"))
-    # prefer canonical tag names over aliases if both exist
+    # v12mix overlay only — do not mix old eval_v2 residual/FINAL logs.
     parsed = []
-    for p in logs:
-        r = parse_log(p)
-        if r:
-            parsed.append(r)
     for p, tag in overlay_logs():
         r = parse_log(p, force_tag=tag)
         if r:
             parsed.append(r)
-    by_tag = {}
-    for r in parsed:
-        # canonical tag wins over alias duplicates
-        prev = by_tag.get(r["tag"])
-        if prev is None or not prev.get("_alias"):
-            r["_alias"] = r["tag"] not in {p.stem for p in logs} and False
-            by_tag[r["tag"]] = r
-    # if both ON_s42 and qd_MOE_SE_s42, the second overwrites with same tag
-    for r in parsed:
-        by_tag[r["tag"]] = r
+    by_tag = {r["tag"]: r for r in parsed}
     rows = list(by_tag.values())
     rows.sort(key=lambda r: (r["fig"], r["arm"], r["seed"]))
 
@@ -220,8 +239,6 @@ def main():
 
     hub = [r for r in rows if r["prefix"] == "qd_MOE_SE"]
     hub_mu = {k: statistics.mean([r[k] for r in hub]) for k in KEYS} if hub else {}
-    hub_rl2 = [r for r in rows if r["prefix"] == "qd_MOE_SE_RL2"]
-    hub_rl2_mu = {k: statistics.mean([r[k] for r in hub_rl2]) for k in KEYS} if hub_rl2 else {}
 
     def pick(*pairs):
         out = {}
@@ -233,14 +250,14 @@ def main():
               "Fig1 PRIMARY v2 + YHSH metrics (goal among ended; prox among ended+open)",
               pick(("ON (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
                    ("OFF", lambda r: r["prefix"] == "qf_SE_OFF")),
-              hub_mu, "v11 freeze same-architecture ON vs trained OFF. Residual hub is Fig2/Fig4, not here.")
+              hub_mu, "v12mix: shared MoE + train soft route-mix=0.15. Same architecture ON vs trained OFF.")
 
     write_fig(OUTD / "FIG2.txt", "Fig2 MoE structures PRIMARY v2 + YHSH metrics",
               pick(("SINGLE", lambda r: r["prefix"] == "q_MOE_SINGLE"),
-                   ("SHARED (hub)", lambda r: r["prefix"] == "qd_MOE_SE_RL2"),
+                   ("SHARED (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
                    ("THIN", lambda r: r["prefix"] == "q_MOE_ISO"),
                    ("THICK", lambda r: r["prefix"] == "base_comm")),
-              hub_rl2_mu)
+              hub_mu, "SHARED = v12mix hub. C2: SHARED beats THIN/THICK (separate encoders).")
 
     write_fig(OUTD / "FIG3.txt", "Fig3 max_partners PRIMARY v2 + YHSH metrics",
               pick(("partners=4 (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
@@ -248,25 +265,26 @@ def main():
               hub_mu)
 
     fig4 = {}
-    for d in (2, 4, 6, 8, 10, 12):
+    for d in (6, 8, 10, 12):
         name = "DIM6 (hub)" if d == 6 else f"DIM{d}"
-        pref = "qd_MOE_SE_RL2" if d == 6 else f"q_DIM{d}"
+        pref = "qd_MOE_SE" if d == 6 else f"q_DIM{d}"
         fig4[name] = [r for r in rows if r["prefix"] == pref]
-    write_fig(OUTD / "FIG4.txt", "Fig4 msg_dim PRIMARY v2 + YHSH metrics", fig4, hub_rl2_mu)
+    write_fig(OUTD / "FIG4.txt", "Fig4 msg_dim PRIMARY v2 + YHSH metrics", fig4, hub_mu)
 
     write_fig(OUTD / "FIG5.txt", "Fig5 COLREGS term PRIMARY v2 + YHSH metrics",
-              pick(("COLREGS on (hub)", lambda r: r["prefix"] == "qd_MOE_SE_RL2"),
+              pick(("COLREGS on (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
                    ("COLREGS off", lambda r: r["prefix"] == "qo_SE_COLREGSOFF")),
-              hub_rl2_mu)
+              hub_mu)
 
     write_fig(OUTD / "FIG6.txt", "Fig6 comm timing PRIMARY v2 + YHSH metrics",
-              pick(("comm @9M (hub)", lambda r: r["prefix"] == "qd_MOE_SE_RL2"),
+              pick(("comm @9M (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
                    ("comm @0 (early)", lambda r: r["prefix"] == "ql_SE_START")),
-              hub_rl2_mu)
+              hub_mu)
 
-    # Fig7 from existing mixed_fleet_rx.csv (C = step-legacy, not PRIMARY v2).
-    # YHSH Fig7: sample-weighted fleet of comm + nocomm groups per (n_rx, seed).
-    fig7_csv = PAPER / "fig7" / "mixed_fleet_rx.csv"
+    # Fig7: v12mix_hub mixed-fleet CSV (C = step-legacy, not PRIMARY v2).
+    fig7_csv = PAPER / "v12mix_hub" / "fig7" / "mixed_fleet_rx.csv"
+    if not fig7_csv.exists():
+        fig7_csv = PAPER / "fig7" / "mixed_fleet_rx.csv"
     W7 = {"goal": "eps", "coll": "eps", "to": "eps", "minsep": "eps",
           "colregs": "colregs_n", "fuel": "goal_eps", "head": "goal_eps",
           "length": "goal_eps", "sit1": "colregs_n", "sit2": "colregs_n",
@@ -334,14 +352,12 @@ def main():
         )
     (OUTD / "FIG8.txt").write_text("\n".join(f8_lines) + "\n", encoding="utf-8")
 
-    n_expect = 3 * (2 + 3 + 1 + 5 + 1 + 1)  # fig1 2arms + fig2 3extra + fig3 1 + fig4 5 + fig5 1 + fig6 1 = 13 cond * 3
     summary = [
-        f"v2 YHSH aggregate  logs={len(rows)} (expect ~39)",
+        f"v12mix YHSH aggregate  logs={len(rows)}",
         f"csv: {csv_path}",
-        f"hub(v11) goal={hub_mu.get('goal', float('nan')):.1f} prox={hub_mu.get('prox', float('nan')):.1f} "
-        f"C_v2={hub_mu.get('C_v2', float('nan')):.1f}  "
-        f"rl2 goal={hub_rl2_mu.get('goal', float('nan')):.1f} prox={hub_rl2_mu.get('prox', float('nan')):.1f}",
-        "Fig7/Fig8: see FIG7/FIG8 notes - mixed/astar still use their own C unless re-eval ported.",
+        f"hub goal={hub_mu.get('goal', float('nan')):.1f} prox={hub_mu.get('prox', float('nan')):.1f} "
+        f"C_v2={hub_mu.get('C_v2', float('nan')):.1f}",
+        "Fig7: v12mix_hub mixed-fleet CSV. Fig8: legacy logs if present.",
     ]
     (OUTD / "README.txt").write_text("\n".join(summary) + "\n", encoding="utf-8")
     print("\n".join(summary))

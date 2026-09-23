@@ -233,6 +233,19 @@ USE_ORACLE = _env_str('VESSEL_ORACLE', '0') == '1'
 # ★라우터=privileged 상황(보상과 동일 ground-truth) → CTDE 일관. situation은 transition마다 저장돼
 #   rollout==update 동일 라우팅(PPO ratio 유효, 메시지 집계 일관성과 같은 원리).
 USE_MOE = _env_str('VESSEL_USE_MOE', '1') == '1'
+# Message/Critic MoE. 기본 1 = 지금과 비트동일. 0이면 USE_MOE여도 메시지·가치는 단일망.
+# 논문 문장: 통신은 공통 언어, COLREGS 전문화는 조타. 메시지 5방언은 수신이 못 읽는다.
+MOE_MSG = _env_str('VESSEL_MOE_MSG', '1') == '1'
+MOE_CRITIC = _env_str('VESSEL_MOE_CRITIC', '1') == '1'
+# 상황 빈도 역가중. 0=off(비트동일). 1이면 미니배치에서 sit k 가중 = (n/(5 n_k)).
+# 조우 없음이 대다수라 양보/유지 머리가 굶는 것(Fig2)을 논문 역할 구조 안에서 고친다.
+SIT_BALANCE = _env_float('VESSEL_SIT_BALANCE', 0.0)
+# 이 결정 수 이전엔 SIT_BALANCE=0. comm_on_at(9M)과 맞추면 항해·통신 먼저, 역할 머리는 그 다음.
+SIT_BALANCE_AT = _env_int('VESSEL_SIT_BALANCE_AT', 0)
+# On-policy rare-sit inflate (Fig2). 0=off. >0이면 조우 없음(sit0)은 그대로 두고
+# sit 1–4를 고유 샘플 복제로 sit0×coef 목표까지 불린다(최대 16×). 평가 해역은 안 바꿈.
+SIT_OVERSAMPLE = _env_float('VESSEL_SIT_OVERSAMPLE', 0.0)
+SIT_OVERSAMPLE_AT = _env_int('VESSEL_SIT_OVERSAMPLE_AT', 0)
 NUM_COLREGS_SITUATIONS = 5   # None/HeadOn/CrossingStandOn/CrossingGiveWay/Overtaking
 # ★iso-parameter MoE (2026-07-03): MoE 전문가 코어의 내부 폭 배수 (conv 채널·radar feat·hidden·fc3에 적용).
 #   1.0(기본) = 기존 MoE — 코어당 단일망과 동일 폭, 총 파라미터 약 5배.
@@ -254,8 +267,17 @@ MOE_SHARE_BACKBONE = _env_str('VESSEL_MOE_SHARE_BACKBONE', '0') == '1'
 #   상황별은 zero-init Δμ만. 희소 전문가가 항해 트렁크를 덮어쓰지 못하게 한다.
 #   기본 0. SHARE_BACKBONE과 같이 켠다. v11/v12 ckpt와 비호환 = from-scratch.
 MOE_RESIDUAL_HEAD = _env_str('VESSEL_MOE_RESIDUAL_HEAD', '0') == '1'
+# ★얇은 μ 헤드: SHARE_BACKBONE일 때 fc3·consumer·logstd까지 공유, 상황별은 action_mean만.
+#   잔차(Δμ) 아님 — 각 상황 hard-route μ. 기본 0. RESIDUAL과 같이 쓰지 말 것.
+MOE_THIN_MU = _env_str('VESSEL_MOE_THIN_MU', '0') == '1'
+# Train-time soft mix: w = (1-mix)*onehot + mix/K. Eval mix=0(hard). Rare heads get grad. Default 0.
+MOE_ROUTE_MIX = _env_float('VESSEL_MOE_ROUTE_MIX', 0.0)
 # Δμ L2. 기본 0. s44가 통신 ON 이후 잔차가 커지며 항해를 깎는 것을 막기 위한 knob.
 MOE_DELTA_L2 = _env_float('VESSEL_MOE_DELTA_L2', 0.0)
+# ★한 지각: Message·Control·Critic이 같은 RadarEncoder를 가리킴 (기본 0=비트동일).
+#   송신 30D와 수신 30D가 다른 좌표계면 6D 메시지가 번역기를 필요로 한다.
+#   ON이면 상황 expert k끼리 모듈 공유. SINGLE도 코어 1벌 공유. from-scratch.
+TIE_MSG_CTRL_ENC = _env_str('VESSEL_TIE_MSG_CTRL_ENC', '0') == '1'
 
 # ============================================================================
 # ★COLREGs situation 정책 입력 (2026-07-02 도입, 2026-07-03 기본 ON 승격): obs[368] 상황(0~4)을
@@ -370,8 +392,12 @@ def get_config_dict():
         'moe_shared': MOE_SHARED,
         'moe_share_backbone': MOE_SHARE_BACKBONE,
         'moe_residual_head': MOE_RESIDUAL_HEAD,
+        'moe_thin_mu': MOE_THIN_MU,
+        'moe_route_mix': MOE_ROUTE_MIX,
         'moe_delta_l2': MOE_DELTA_L2,
         'situation_input': SITUATION_INPUT,
+        'sit_oversample': SIT_OVERSAMPLE,
+        'sit_oversample_at': SIT_OVERSAMPLE_AT,
         'num_colregs_situations': NUM_COLREGS_SITUATIONS,
         'use_attention': USE_ATTENTION,
         'attn_dim': ATTN_DIM,

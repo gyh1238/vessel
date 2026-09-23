@@ -28,8 +28,8 @@ from config import (STATE_SIZE, RADAR_FEAT_DIM, USE_COMMUNICATION,
                     ROLE_COMM_COEF, USE_MOE, NUM_COLREGS_SITUATIONS, MAX_COMM_PARTNERS,
                     COMM_CONSUMER_COEF, COMM_CONSUMER_K, COMM_CONSUMER_COUPLING, USE_ORACLE,
                     SITUATION_INPUT, MOE_WIDTH, MOE_SHARED, MOE_SHARE_BACKBONE,
-                    MOE_RESIDUAL_HEAD, POS_GROUND, STATE_RECON_COEF,
-                    CENTRAL_CRITIC)
+                    MOE_RESIDUAL_HEAD, MOE_THIN_MU, MOE_ROUTE_MIX, POS_GROUND, STATE_RECON_COEF,
+                    CENTRAL_CRITIC, TIE_MSG_CTRL_ENC, MOE_MSG, MOE_CRITIC)
 
 
 _RADAR_LEAKY = os.environ.get('VESSEL_RADAR_ACT', 'relu').lower() == 'leaky'
@@ -62,6 +62,7 @@ def _copy_heads(experts, module_names, param_names=()):
 
 def _apply_shared_moe(experts, kind):
     """MOE_SHARED: radar 공유. SHARE_BACKBONE: fc2(+gate) 공유 후 head 복사.
+    THIN_MU: SHARE_BACKBONE에서 fc3·consumer·logstd도 공유, 상황별은 action_mean만.
     RESIDUAL_HEAD: fc3·action_mean까지 공유하고 상황별은 zero-init action_delta만.
     kind: 'msg' | 'ctrl' | 'critic'."""
     if not MOE_SHARED:
@@ -84,6 +85,11 @@ def _apply_shared_moe(experts, kind):
             _share_attr(experts, 'consumer_decoder')
             _share_attr(experts, 'action_mean')
             _share_attr(experts, 'action_logstd')
+        elif MOE_THIN_MU:
+            _share_attr(experts, 'fc3')
+            _share_attr(experts, 'consumer_decoder')
+            _share_attr(experts, 'action_logstd')
+            _copy_heads(experts, ('action_mean',))
         else:
             _copy_heads(experts, ('fc3', 'action_mean', 'consumer_decoder'), ('action_logstd',))
     elif kind == 'critic':
@@ -471,7 +477,7 @@ class MessageActor(nn.Module):
         super(MessageActor, self).__init__()
         self.frames = frames
         self.msg_dim = msg_dim
-        self.use_moe = USE_MOE
+        self.use_moe = USE_MOE and MOE_MSG
         self.num_experts = NUM_COLREGS_SITUATIONS
         if self.use_moe:
             # MOE_WIDTH<1.0 = iso-parameter MoE (5코어 합계 ≈ 단일망). 단일망은 항상 폭 1.0.
@@ -671,11 +677,34 @@ class ControlActor(nn.Module):
             mean, logstd, dec = self.core.head(z)
             self._cache_dec(z, dec)
             return z, mean, logstd, batch_size, n_agent
-        # 상황별 hard-route (코어 통째). 각 sample은 자기 상황 코어만 통과 → 그 코어만 gradient.
         if situation is not None:
             sit = situation.reshape(M).long().clamp(0, self.num_experts - 1)
         else:
             sit = torch.zeros(M, dtype=torch.long, device=x.device)
+        # Soft mix only while training: every head gets mix/K mass so rare experts see gradient.
+        # Eval stays hard-route (COLREGS situation). PPO: rollout==update both train → same mix.
+        mix = float(MOE_ROUTE_MIX) if (self.training and MOE_ROUTE_MIX > 0.0) else 0.0
+        if mix > 0.0:
+            w = torch.full((M, self.num_experts), mix / self.num_experts, device=x.device, dtype=x_f.dtype)
+            w.scatter_(1, sit.view(-1, 1), 1.0 - mix + mix / self.num_experts)
+            z = x_f.new_zeros(M, self.core_hidden)
+            mean = x_f.new_zeros(M, self.action_size)
+            logstd = x_f.new_zeros(M, self.action_size)
+            dec_full = None
+            for k in range(self.num_experts):
+                zk = self.experts[k].backbone(x_f, goal_f, self_f, om_f, sit_oh)
+                mk, lk, dk = self.experts[k].head(zk)
+                wk = w[:, k:k + 1]
+                z = z + wk * zk
+                mean = mean + wk * mk
+                logstd = logstd + wk * lk
+                if dk is not None:
+                    if dec_full is None:
+                        dec_full = x_f.new_zeros(M, dk.shape[-1])
+                    dec_full = dec_full + wk * dk
+            self._cache_dec(z, dec_full)
+            return z, mean, logstd, batch_size, n_agent
+        # 상황별 hard-route (코어 통째). 각 sample은 자기 상황 코어만 통과 → 그 코어만 gradient.
         z = x_f.new_zeros(M, self.core_hidden)
         mean = x_f.new_zeros(M, self.action_size)
         logstd = x_f.new_zeros(M, self.action_size)
@@ -832,7 +861,7 @@ class Critic(nn.Module):
         super(Critic, self).__init__()
         self.frames = frames
         self.msg_dim = msg_dim
-        self.use_moe = USE_MOE
+        self.use_moe = USE_MOE and MOE_CRITIC
         self.num_experts = NUM_COLREGS_SITUATIONS
         if self.use_moe:
             # MOE_WIDTH<1.0 = iso-parameter MoE (5코어 합계 ≈ 단일망). 단일망은 항상 폭 1.0.
@@ -910,6 +939,8 @@ class CNNPolicy(nn.Module):
         self.msg_actor = MessageActor(frames, msg_dim)
         self.ctr_actor = ControlActor(frames, msg_dim, action_size)
         self.critic = Critic(frames, msg_dim)
+        if TIE_MSG_CTRL_ENC:
+            self._tie_perception()
 
         # ★ 위치 grounding (AIS-style, 2026-07-03 기본 ON): 파트너의 [상대방위(sin,cos)+거리] 3D를 메시지에 결합 →
         #   receiver가 "어느 방위에서 온 메시지"인지 알게 됨. VESSEL_POS_GROUND=0으로 sum 대조군.
@@ -1120,6 +1151,13 @@ class CNNPolicy(nn.Module):
         if msg_gain != 1.0:
             others_msg = others_msg * msg_gain
         return others_msg
+
+    def _tie_perception(self):
+        """한 RadarEncoder를 Message·Control·Critic 모든 코어에 꽂는다. 코어 수가 달라도(메시지 1 vs 조타 5) 같다."""
+        msg = self.msg_actor.cores()
+        enc = msg[0].radar_encoder
+        for core in self.ctr_actor.cores() + self.critic.cores() + msg:
+            core.radar_encoder = enc
 
     def _central_critic_active(self):
         """중앙 critic 브랜치(glob_enc)가 *실제로* 만들어졌는지 — 모듈 상수 대신 인스턴스로 판정.

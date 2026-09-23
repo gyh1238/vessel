@@ -1,0 +1,25 @@
+== Fig1 ON vs OFF ==
+A goal=95.7±0.9 prox=1.47±0.56 C=98.3
+B goal=92.7±2.8 prox=2.55±0.72 C=98.1
+Fig1 ON>OFF: PASS dGoal=+3.1 dProx=-1.08 seeds=2/3
+
+== Fig3 hub(K=4) vs NEAR1 ==
+A goal=95.7±0.9 prox=1.47±0.56 C=98.3
+B goal=94.6±1.7 prox=1.93±0.80 C=97.9
+hub>=ablate: PASS dGoal=+1.1 dProx=-0.46 seeds=2/3
+
+== Fig4 DIM6 hub vs DIM8/10/12 ==
+DIM6 goal=95.7±0.9 prox=1.47±0.56 C=98.3
+DIM8 goal=94.1±1.6 prox=2.20±0.60 C=97.3
+DIM10 goal=94.2±1.6 prox=2.03±0.45 C=97.3
+DIM12 goal=92.7±1.5 prox=2.85±0.67 C=98.3
+
+== Fig5 hub vs COLREGS-off ==
+COLREGS_ON goal=95.7±0.9 prox=1.47±0.56 C=98.3
+COLREGS_OFF goal=95.6±0.8 prox=1.70±0.31 C=65.8
+C lift: hub=98.3 vs OFF=65.8 (PASS)
+
+== Fig6 hub@9M vs COMM@0 ==
+A goal=95.7±0.9 prox=1.47±0.56 C=98.3
+B goal=93.1±1.4 prox=2.48±0.84 C=97.8
+hub>=ablate: PASS dGoal=+2.6 dProx=-1.01 seeds=2/3

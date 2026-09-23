@@ -338,6 +338,28 @@ def comm_gather(policy, env, x, goal, self_s, sit, K, send_mask=None, recv_mask=
     return others_msg, (px, pg, ps, pmask, prelpos, psit)
 
 
+def _sit_inflate_idx(sit, M, coef, device, n_sit=5, max_dup=16):
+    """Keep every rollout row; duplicate sit 1–4 toward n0*coef (cap max_dup × unique)."""
+    s = sit.reshape(-1).long().clamp(0, n_sit - 1)
+    counts = torch.bincount(s, minlength=n_sit)
+    n0 = int(counts[0].item())
+    idx = [torch.arange(M, device=device)]
+    if n0 <= 0 or coef <= 0.0:
+        return idx[0]
+    target = max(1, int(round(n0 * float(coef))))
+    for k in range(1, n_sit):
+        nk = int(counts[k].item())
+        if nk <= 0:
+            continue
+        want = min(target, nk * max_dup)
+        extra = want - nk
+        if extra <= 0:
+            continue
+        pool = (s == k).nonzero(as_tuple=False).view(-1)
+        idx.append(pool[torch.randint(0, nk, (extra,), device=device)])
+    return torch.cat(idx)
+
+
 def main():
     ap = argparse.ArgumentParser()
     # OFF=통신 없음 / ORACLE=참 파트너 goal 주입(정보 상한) / ON=학습형 comm / RANDOM=난수 메시지 대조군
@@ -415,6 +437,20 @@ def main():
             _os_msg = 'Adam 없음(재축적)'
         print(f"[resume] {os.path.basename(args.resume)} 에서 이어감 | {args.resume_at/1e6:.2f}M 완료분 | "
               f"ValueNorm {_ck.get('value_norm')} | {_os_msg}", flush=True)
+
+    # Lock shared eye + language; train only COLREGS helm/value heads.
+    if os.environ.get('VESSEL_FREEZE_TRUNK', '0') == '1':
+        _head = ('fc3', 'action_mean', 'action_logstd', 'action_delta', 'value_out')
+        n_all = n_ok = 0
+        for name, p in policy.named_parameters():
+            n_all += p.numel()
+            if any(k in name for k in _head):
+                n_ok += p.numel()
+                continue
+            p.requires_grad = False
+        opt = torch.optim.Adam([p for p in policy.parameters() if p.requires_grad],
+                               lr=cfg.LEARNING_RATE)
+        print(f"[freeze-trunk] helm-only Adam | trainable {n_ok}/{n_all}", flush=True)
 
     # ★arm ON 인데 통신이 꺼져 있으면 rollout(comm_gather 는 USE_COMMUNICATION 을 안 봄)과
     #   update(networks.evaluate_actions 는 0으로 만듦)의 others_msg 가 달라져 PPO ratio 가 조용히 깨진다.
@@ -505,7 +541,14 @@ def main():
             'use_moe': bool(cfg.USE_MOE), 'moe_shared': bool(cfg.MOE_SHARED),
             'moe_share_backbone': bool(cfg.MOE_SHARE_BACKBONE),
             'moe_residual_head': bool(cfg.MOE_RESIDUAL_HEAD),
+            'moe_thin_mu': bool(cfg.MOE_THIN_MU),
+            'moe_msg': bool(cfg.MOE_MSG), 'moe_critic': bool(cfg.MOE_CRITIC),
             'moe_delta_l2': float(cfg.MOE_DELTA_L2), 'moe_width': float(cfg.MOE_WIDTH),
+            'tie_msg_ctrl_enc': bool(cfg.TIE_MSG_CTRL_ENC),
+            'situation_input': bool(cfg.SITUATION_INPUT),
+            'sit_oversample': float(cfg.SIT_OVERSAMPLE),
+            'radar_range': float(os.environ.get('VESSEL_RADAR_RANGE', '56')),
+            'radar_dropout_p': float(os.environ.get('VESSEL_RADAR_DROPOUT_P', '0')),
             'msg_ln': os.environ.get('VESSEL_MSG_LN', '1') == '1',
             'comm_range': float(cfg.COMM_RANGE), 'max_partners': int(args.max_partners),
             'comm_on_at': int(args.comm_on_at), 'ring': float(args.ring), 'crossing': int(args.crossing),
@@ -678,10 +721,20 @@ def main():
             # ─── PPO update ───
             # ★2026-09-05 fix: randperm 을 epoch 루프 *안*으로. 밖에 있으면 N_EPOCH 회가 전부 같은
             #   미니배치 분할을 반복해 epoch 간 표본 상관이 생긴다(PPO 표준은 epoch 마다 재셔플).
+            # SIT_OVERSAMPLE: sit0 유지, 희소 조우만 같은 롤아웃에서 복제. 환경 스폰은 그대로.
+            if cfg.SIT_OVERSAMPLE > 0.0 and total_decisions >= cfg.SIT_OVERSAMPLE_AT:
+                _pool = _sit_inflate_idx(fsit, M, cfg.SIT_OVERSAMPLE, device)
+            else:
+                _pool = None
             mb = cfg.MINIBATCH_SIZE
             for _ in range(cfg.N_EPOCH):
-                idx_all = torch.randperm(M, device=device)
-                for s in range(0, M, mb):
+                if _pool is None:
+                    idx_all = torch.randperm(M, device=device)
+                    n_idx = M
+                else:
+                    idx_all = _pool[torch.randperm(_pool.numel(), device=device)]
+                    n_idx = idx_all.numel()
+                for s in range(0, n_idx, mb):
                     mi = idx_all[s:s + mb]
                     aux = 0.0
                     if comm_active:
@@ -731,8 +784,18 @@ def main():
                     a_mb = fadv[mi]
                     pg1 = ratio * a_mb
                     pg2 = torch.clamp(ratio, 1 - cfg.EPSILON, 1 + cfg.EPSILON) * a_mb
-                    policy_loss = -torch.min(pg1, pg2).mean()
-                    value_loss = ((value_new - fret[mi]) ** 2).mean()
+                    pg = torch.min(pg1, pg2)
+                    vsq = (value_new - fret[mi]) ** 2
+                    if cfg.SIT_BALANCE > 0.0 and total_decisions >= cfg.SIT_BALANCE_AT:
+                        _sc = torch.bincount(fsit[mi].reshape(-1).clamp(0, 4), minlength=5).float().clamp(min=1.0)
+                        _sw = (_sc.sum() / (5.0 * _sc)).pow(cfg.SIT_BALANCE)
+                        _sw = _sw[fsit[mi].reshape(-1)].to(pg.dtype)
+                        _sw = _sw / _sw.mean().clamp(min=1e-6)
+                        policy_loss = -(pg * _sw).mean()
+                        value_loss = (vsq * _sw).mean()
+                    else:
+                        policy_loss = -pg.mean()
+                        value_loss = vsq.mean()
                     if cfg.MOE_DELTA_L2 > 0.0 and getattr(cfg, 'MOE_RESIDUAL_HEAD', False):
                         aux = aux + cfg.MOE_DELTA_L2 * policy.ctr_actor.delta_l2()
                     loss = policy_loss + cfg.CRITIC_LOSS_WEIGHT * value_loss - cfg.ENTROPY_BONUS * entropy + aux
@@ -756,11 +819,11 @@ def main():
                                 _radar_g += float(_p.grad.detach().abs().sum())
                     _blind_now = (_radar_g == 0.0)
                     _blind_run = _blind_run + 1 if _blind_now else 0
-                    if _blind_run == _BLIND_WARN:
-                        print(f'[blind] ControlActor 레이더 인코더 gradient 가 {_BLIND_WARN} 미니배치 연속 0 임. '
-                              f'정책이 레이더를 못 보는 상태(dying ReLU)로 굳는 중일 수 있음 — '
-                              f'2026-09-04 off_s45 붕괴와 같은 지문. ctr_actor 전체 grad={_rg:.3e}. '
-                              f'장애물 충돌률(oColl)을 확인할 것.', flush=True)
+                    # Frozen trunk makes radar grad identically 0; not dying ReLU.
+                    if _blind_run == _BLIND_WARN and os.environ.get('VESSEL_FREEZE_TRUNK', '0') != '1':
+                        print(f'[blind] ControlActor radar encoder grad is 0 for {_BLIND_WARN} minibatches. '
+                              f'Policy may be blind (dying ReLU), same fingerprint as 2026-09-04 off_s45. '
+                              f'ctr_actor grad={_rg:.3e}. Check oColl.', flush=True)
                     nn.utils.clip_grad_norm_(policy.parameters(), cfg.MAX_GRAD_NORM)
                     opt.step()
 

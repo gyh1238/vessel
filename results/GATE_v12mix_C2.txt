@@ -1,0 +1,7 @@
+WIN
+SHARED goal=95.7±0.9 prox=1.47±0.56 C=98.3
+SINGLE goal=95.6±1.6 prox=1.74±0.66 C=96.7
+THIN goal=87.4±0.2 prox=4.52±0.24 C=98.0
+THICK goal=92.3±0.8 prox=2.50±0.29 C=97.7
+C2 SHARED>=THIN: PASS dGoal=+8.4 dProx=-3.05
+C2 SHARED>=THICK: PASS dGoal=+3.4 dProx=-1.03

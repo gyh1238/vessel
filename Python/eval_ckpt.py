@@ -125,10 +125,20 @@ def main():
             net.MOE_RESIDUAL_HEAD = bool(_snap.get('moe_residual_head'))
         if 'moe_width' in _snap:
             net.MOE_WIDTH = float(_snap.get('moe_width'))
+        if 'tie_msg_ctrl_enc' in _snap:
+            net.TIE_MSG_CTRL_ENC = bool(_snap.get('tie_msg_ctrl_enc'))
+        if 'moe_msg' in _snap:
+            net.MOE_MSG = bool(_snap.get('moe_msg'))
+        if 'moe_critic' in _snap:
+            net.MOE_CRITIC = bool(_snap.get('moe_critic'))
+        if 'situation_input' in _snap:
+            net.SITUATION_INPUT = bool(_snap.get('situation_input'))
+            net.SIT_INPUT_DIM = net.NUM_COLREGS_SITUATIONS if net.SITUATION_INPUT else 0
         print(f"[eval] ckpt 설정 적용: attention={net.USE_ATTENTION} pos_ground={net.POS_GROUND} "
               f"central_critic={net.CENTRAL_CRITIC} state_recon={net.STATE_RECON_COEF} "
               f"moe={net.USE_MOE} shared={net.MOE_SHARED} share_backbone={net.MOE_SHARE_BACKBONE} "
               f"residual_head={getattr(net, 'MOE_RESIDUAL_HEAD', False)} "
+              f"tie_enc={getattr(net, 'TIE_MSG_CTRL_ENC', False)} "
               f"width={net.MOE_WIDTH} msg_dim={_msg_dim}", flush=True)
         # 학습 arm 과 평가 arm 이 어긋나면 다른 실험을 재는 것이므로 즉시 실패시킨다.
         _ck_arm = _snap.get('arm') or (sd.get('arm') if isinstance(sd, dict) else None)
