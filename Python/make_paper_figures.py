@@ -33,9 +33,11 @@ import schematics as sch
 SIT4 = ["Head-On", "Give-Way", "Overtaking", "Stand-On"]
 SIT_KEYS = ("sit1", "sit3", "sit4", "sit2")
 W_GOAL, W_PROX, W_TO = 1.5, 6.0, 0.5
-# Measured state-dict numel from v12mix / v12mix_hub ckpts (s42).
+# Trainable unique params (optimizer sees shared tensors once).
+# state_dict stores 5 identical copies of shared modules for load compat —
+# do NOT use serialized numel for SHARED (that falsely matches THICK).
 PARAMS = {
-    "SINGLE": 369771, "THIN": 368190, "THICK": 902415, "SHARED": 902415,
+    "SINGLE": 369771, "THIN": 368190, "THICK": 902415, "SHARED": 370295,
 }
 
 
@@ -182,7 +184,8 @@ def fig2(rows):
     fig.text(0.5, -0.015,
              "v12mix: shared MoE (shared eye/backbone, situation steering heads, train soft route-mix=0.15) "
              "vs single / separate-thin / separate-full, 3 seeds.\n"
-             "SHARED ≥ SINGLE on arrival and proximity; THIN/THICK (separate encoders) lose. Not residual Δμ.",
+             "SHARED ≈ SINGLE in trainable params (eye shared); THICK duplicates encoders. "
+             "SHARED ≥ SINGLE on arrival/proximity; THIN/THICK lose. Not residual Δμ.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig2_MoE_architecture")
 
