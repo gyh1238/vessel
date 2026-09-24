@@ -447,10 +447,12 @@ def fig7(_rows):
 
     fig.text(0.5, -0.035,
              f"v12mix hub, mute-TX (rx-only) sweep, {len(seeds)} seeds, sample-weighted fleet.\n"
+             "Each n_rx is an isolated eval (64 envs) matching Fig1 budget — "
+             "n_rx=0 anchors to Fig1 ON (~95%).\n"
              "Claim: cutting transmitters does not collapse the fleet while receivers still hear. "
-             "Not the same as Fig1 Comm OFF (all messages zeroed).\n"
+             "n_rx=16 is test-time message ablation on the ON policy (not Fig1 OFF-trained).\n"
              "Step-legacy COLREGs panel removed (was ~63% and not PRIMARY).",
-             ha="center", fontsize=8.0, color=C["mute"])
+             ha="center", fontsize=7.6, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig7_Heterogeneous_fleet")
 
 
