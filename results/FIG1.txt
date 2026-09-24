@@ -2,6 +2,6 @@ Fig1 PRIMARY v2 + YHSH metrics (goal among ended; prox among ended+open)
 v12mix: shared MoE + train soft route-mix=0.15. Same architecture ON vs trained OFF.
 
 arm                    goal       prox       C_v2       sit1       sit2       sit3       sit4       fuel       head     minSep        len  n
-ON (hub)           95.7±0.9    1.5±0.6   98.3±0.5  100.0±0.0   95.7±0.1   99.3±0.6   98.9±1.0 833.0±15.0 1923.3±166.1   20.9±1.0 850.7±16.3  3
-OFF                92.7±2.8    2.5±0.7   98.1±0.1   99.8±0.2   94.5±0.1   99.8±0.3   99.2±1.4 828.8±24.1 1846.7±139.3   20.6±0.7 850.7±26.7  3
+ON (hub)           95.7±0.9    1.5±0.6   96.2±0.9   99.7±0.5   88.9±3.2   99.1±0.8   98.9±1.0 833.0±15.0 1923.3±166.1   20.9±1.0 850.7±16.3  3
+OFF                92.7±2.8    2.5±0.7   95.5±0.4   99.4±0.6   86.5±1.4   99.8±0.3   98.7±1.2 828.8±24.1 1846.7±139.3   20.6±0.7 850.7±26.7  3
                dprox=+73.2% vs hub  dfuel=-0.5% vs hub  dhead=-4.0% vs hub

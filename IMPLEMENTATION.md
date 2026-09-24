@@ -132,11 +132,12 @@ envs=64  burnin=800  eval_decisions=3000  ring=0.7  max_partners=4
 
 Fig3만 `max_partners=1`. 창 끝 미완은 집계에서 빼고 `[censored]`로 개수를 남긴다. 첫 종료는 phase 때문에 제외.
 
-PRIMARY v2 (요지, 상세는 `results/COLREGS_EVAL.md`):
+PRIMARY v2-strict (요지; env `VESSEL_EVAL_PRIMARY_*` / `VESSEL_EVAL_SO_NULL_Q`):
 
-- 양보(sit 1/3/4): 우현 오프셋≥10° **또는** 우현 Δψ≥10° **또는** 감속≥15%.
-- 유지(sit 2): 같은 길이 무조우 창 \|Δψ\|의 P75 이하 **또는** 최근접 < 28.4 m.
+- 양보(sit 1/3/4): 우현 오프셋≥**15°** **또는** 우현 Δψ≥**15°** **또는** 감속≥**20%**.
+- 유지(sit 2): 같은 길이 무조우 창 |Δψ|의 **P60** 이하 **또는** 최근접 < 28.4 m.
 - 주지표 = 모든 쌍. 로그에 v2 / v2-dominant / v11 / legacy-step을 같이 찍는다.
+- 조건 선택은 계속 **goal/prox**. C는 진단·Fig5용.
 
 `aggregate_eval_v2.py`가 `eval_v2/*.log`를 읽어
 
@@ -146,7 +147,7 @@ PRIMARY v2 (요지, 상세는 `results/COLREGS_EVAL.md`):
 
 `FIG*_FORMAL*.txt`와 `eval/*.log`는 덮지 않는다.
 
-Fig7 `eval_mixed.py`, Fig8 `eval_astar_global.py`는 아직 쌍-PRIMARY를 안 심었다. C는 step-legacy.
+Fig7 `eval_mixed.py`는 step-legacy C를 찍지만 **그림에서는 쓰지 않는다** (prox/goal/minSep). Fig8도 step-legacy.
 
 ---
 
@@ -190,37 +191,35 @@ THIN은 단일망과 파라미터를 맞춰 **전문화 vs 용량**을 분리한
 | 팔 | 태그 | override |
 |----|------|----------|
 | DIM6 | hub | 6 |
-| DIM2/4/8/10/12 | `q_DIM{d}_*` | `VESSEL_MSG_DIM=d` (학습·네트워크 shape) |
+| DIM2/4/8/10/12 | `q_DIM{d}_MX_*` | `VESSEL_MSG_DIM=d` (학습·네트워크 shape) |
 
-**공유 MoE에서** 스윕한다. YHSH Fig4는 분리·두껍게였다.
+**공유 MoE에서** 스윕한다. unique 파라미터는 |m|에 거의 안 변한다(~215–223K).
 
-### Fig5 규정 항
+### Fig5 규정 계수 투입 시점
 
 | 팔 | 태그 | override |
 |----|------|----------|
-| ON | hub | `SIM_COLREGS_COEF=0.45` |
-| OFF | `qo_SE_COLREGSOFF_*` | `=0` |
+| early | hub | `SIM_COLREGS_COEF=0.45` from step 0 |
+| late | `qo_SE_COLREGS_LATE_MX_*` | `--colregs_coef_on_at 9000000` (0→0.45 @9M) |
 
-구조는 hub. 평가 때 계수를 0으로 끄는 것이 아니라 **항 없이 학습한 정책**을 잰다.
+구조·통신은 hub와 같다. **전면 OFF(coef=0 학습)는 본문 축이 아님** (C만 붕괴).
 
 ### Fig6 통신 시점
 
 | 팔 | 태그 | `comm_on_at` |
 |----|------|----------------|
 | 9M | hub | 9_000_000 |
-| 0 | `ql_SE_START_*` | 0 |
+| 0 | `qo_SE_COMM0_MX_*` | 0 |
 
 총 16M은 같다. 메시지가 흐르기 시작하는 스텝만 다르다.
 
 ### Fig7 혼합함대 (학습 없음)
 
-- 스크립트: `eval_fig7_paper.ps1` → `eval_mixed.py`
+- 스크립트: `eval_fig7_v12mix.ps1` → `eval_mixed.py`
 - 정책: hub ×3 시드
-- n_rx ∈ {2,4,6,8,10,12,14}. 그 척은 **송신 불가, 수신은 가능**
-- 대략 `envs_per=14 burnin=1200 eval_decisions=4500`
-- 산출: `runs/paper/fig7/mixed_fleet_rx.csv`  
-  함대값은 통신가능/불가 두 무리를 표본수 가중 (`eps` / `colregs_n` / `goal_eps`)
-- C·prox는 Fig1–6 PRIMARY/근접 정의와 **아직 다름**
+- n_rx ∈ {0,2,…,16}. 그 척은 **송신 불가, 수신은 가능** (mode=rx)
+- 산출: `runs/paper/v12mix_hub/fig7/mixed_fleet_rx.csv` (+ tracked copy `runs/paper/fig7/`)
+- 그림 패널: prox / goal / minSep. step-legacy C는 쓰지 않음.
 
 ### Fig8 전역경로 (학습 없음)
 

@@ -365,6 +365,9 @@ def main():
     # OFF=통신 없음 / ORACLE=참 파트너 goal 주입(정보 상한) / ON=학습형 comm / RANDOM=난수 메시지 대조군
     ap.add_argument('--arm', default='OFF', choices=['OFF', 'ORACLE', 'ON', 'RANDOM'])
     ap.add_argument('--comm_on_at', type=int, default=0)   # ON arm: comm 켜는 decision 임계(curriculum). 0=처음부터
+    # Fig5 curriculum: COLREGS reward coef stays 0 until this decision, then jumps to VESSEL_SIM_COLREGS_COEF.
+    # 0 = use env coef from the first step (no ramp).
+    ap.add_argument('--colregs_coef_on_at', type=int, default=0)
     ap.add_argument('--max_partners', type=int, default=cfg.MAX_COMM_PARTNERS)  # msg 처리: 4=aggregation, 1=nearest-1
     ap.add_argument('--ckpt_every', type=float, default=0.0)  # M단위 중간 체크포인트(0=끄기)
     ap.add_argument('--steps', type=int, default=1_000_000)   # 총 env-decision (환경당)
@@ -551,7 +554,9 @@ def main():
             'radar_dropout_p': float(os.environ.get('VESSEL_RADAR_DROPOUT_P', '0')),
             'msg_ln': os.environ.get('VESSEL_MSG_LN', '1') == '1',
             'comm_range': float(cfg.COMM_RANGE), 'max_partners': int(args.max_partners),
-            'comm_on_at': int(args.comm_on_at), 'ring': float(args.ring), 'crossing': int(args.crossing),
+            'comm_on_at': int(args.comm_on_at),
+            'colregs_coef_on_at': int(args.colregs_coef_on_at),
+            'ring': float(args.ring), 'crossing': int(args.crossing),
             'vessels': int(N), 'envs': int(E), 'rollout': int(args.rollout), 'seed': int(args.seed),
             'msg_random_sd': float(os.environ.get('VESSEL_MSG_RANDOM_SD', 0.20)) if args.arm == 'RANDOM' else None,
         }
@@ -567,6 +572,11 @@ def main():
 
     T = args.rollout
     total_decisions = args.resume_at      # ★재개 시 이어서 카운트 (--steps 는 '총' 결정 수)
+    # Fig5 curriculum: ramp COLREGS reward coef from 0 → target at colregs_coef_on_at.
+    _colregs_coef_target = float(vg.COLREGS_SIM_COEF)
+    if args.colregs_coef_on_at > 0:
+        print(f"[colregs-curriculum] coef=0 until {args.colregs_coef_on_at/1e6:.1f}M, "
+              f"then {_colregs_coef_target}", flush=True)
     outcome_counts = torch.zeros(5, device=device)
     t_start = time.time()
     update_i = 0
@@ -615,6 +625,10 @@ def main():
             # ─── rollout ───
             # ★comm curriculum: ON arm이고 comm_on_at 넘으면 학습형 comm 활성(이 rollout 내내 일관 → PPO 정합)
             comm_active = (args.arm == 'ON' and total_decisions >= args.comm_on_at)
+            # ★Fig5 COLREGS coef curriculum (module global read by vessel_gym.reward)
+            if args.colregs_coef_on_at > 0:
+                vg.COLREGS_SIM_COEF = (
+                    _colregs_coef_target if total_decisions >= args.colregs_coef_on_at else 0.0)
             keys = ['x', 'goal', 'self', 'sit', 'om', 'act', 'logp', 'val', 'rew', 'done', 'trunc']
             if cfg.CENTRAL_CRITIC:
                 keys += ['gf']

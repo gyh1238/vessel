@@ -43,7 +43,9 @@ COND = {
     "qf_SE_NEAR1": ("fig3", "NEAR1"),
     "qf_SE_NEAR1_MX": ("fig3", "NEAR1"),
     "q_DIM2": ("fig4", "DIM2"),
+    "q_DIM2_MX": ("fig4", "DIM2"),
     "q_DIM4": ("fig4", "DIM4"),
+    "q_DIM4_MX": ("fig4", "DIM4"),
     "q_DIM8": ("fig4", "DIM8"),
     "q_DIM8_MX": ("fig4", "DIM8"),
     "q_DIM10": ("fig4", "DIM10"),
@@ -52,6 +54,8 @@ COND = {
     "q_DIM12_MX": ("fig4", "DIM12"),
     "qo_SE_COLREGSOFF": ("fig5", "COLREGSOFF"),
     "qo_SE_COLREGSOFF_MX": ("fig5", "COLREGSOFF"),
+    "qo_SE_COLREGS_LATE": ("fig5", "COLREGS_LATE"),
+    "qo_SE_COLREGS_LATE_MX": ("fig5", "COLREGS_LATE"),
     "ql_SE_START": ("fig6", "EARLY"),
     "qo_SE_COMM0_MX": ("fig6", "EARLY"),
 }
@@ -64,14 +68,17 @@ CANON = {
     "q_MOE_THIN_MX": "q_MOE_ISO",
     "q_MOE_THICK_MX": "base_comm",
     "qf_SE_NEAR1_MX": "qf_SE_NEAR1",
+    "q_DIM2_MX": "q_DIM2",
+    "q_DIM4_MX": "q_DIM4",
     "q_DIM8_MX": "q_DIM8",
     "q_DIM10_MX": "q_DIM10",
     "q_DIM12_MX": "q_DIM12",
     "qo_SE_COLREGSOFF_MX": "qo_SE_COLREGSOFF",
+    "qo_SE_COLREGS_LATE_MX": "qo_SE_COLREGS_LATE",
     "qo_SE_COMM0_MX": "ql_SE_START",
 }
 
-# v12mix hub overlay: remap post_* logs onto canonical tags.
+# Prefer v12mix_review strict_* (PRIMARY v2-strict). Older post_* are fallback only.
 OVERLAY = (
     (PAPER / "v12mix" / "eval", {
         "post_qd_MOE_SE_MX": "qd_MOE_SE",
@@ -88,6 +95,21 @@ OVERLAY = (
         "post_q_DIM12_MX": "q_DIM12",
         "post_q_MOE_THIN_MX": "q_MOE_ISO",
         "post_q_MOE_THICK_MX": "base_comm",
+    }),
+    (PAPER / "v12mix_review" / "eval", {
+        "strict_qd_MOE_SE_MX": "qd_MOE_SE",
+        "strict_q_MOE_SINGLE_MX": "q_MOE_SINGLE",
+        "strict_qf_SE_OFF_MX": "qf_SE_OFF",
+        "strict_qf_SE_NEAR1_MX": "qf_SE_NEAR1",
+        "strict_qo_SE_COMM0_MX": "ql_SE_START",
+        "strict_q_DIM2_MX": "q_DIM2",
+        "strict_q_DIM4_MX": "q_DIM4",
+        "strict_q_DIM8_MX": "q_DIM8",
+        "strict_q_DIM10_MX": "q_DIM10",
+        "strict_q_DIM12_MX": "q_DIM12",
+        "strict_q_MOE_THIN_MX": "q_MOE_ISO",
+        "strict_q_MOE_THICK_MX": "base_comm",
+        "strict_qo_SE_COLREGS_LATE_MX": "qo_SE_COLREGS_LATE",
     }),
 )
 
@@ -265,18 +287,18 @@ def main():
               hub_mu)
 
     fig4 = {}
-    for d in (6, 8, 10, 12):
+    for d in (2, 4, 6, 8, 10, 12):
         name = "DIM6 (hub)" if d == 6 else f"DIM{d}"
         pref = "qd_MOE_SE" if d == 6 else f"q_DIM{d}"
         fig4[name] = [r for r in rows if r["prefix"] == pref]
-    write_fig(OUTD / "FIG4.txt", "Fig4 msg_dim PRIMARY v2 + YHSH metrics", fig4, hub_mu)
+    write_fig(OUTD / "FIG4.txt", "Fig4 msg_dim PRIMARY v2-strict + YHSH metrics", fig4, hub_mu)
 
-    write_fig(OUTD / "FIG5.txt", "Fig5 COLREGS term PRIMARY v2 + YHSH metrics",
-              pick(("COLREGS on (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
-                   ("COLREGS off", lambda r: r["prefix"] == "qo_SE_COLREGSOFF")),
-              hub_mu)
+    write_fig(OUTD / "FIG5.txt", "Fig5 COLREGS coef timing PRIMARY v2-strict + YHSH metrics",
+              pick(("early @0 (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
+                   ("late @9M", lambda r: r["prefix"] == "qo_SE_COLREGS_LATE")),
+              hub_mu, "early=coef 0.45 from start; late=0 until 9M then 0.45.")
 
-    write_fig(OUTD / "FIG6.txt", "Fig6 comm timing PRIMARY v2 + YHSH metrics",
+    write_fig(OUTD / "FIG6.txt", "Fig6 comm timing PRIMARY v2-strict + YHSH metrics",
               pick(("comm @9M (hub)", lambda r: r["prefix"] == "qd_MOE_SE"),
                    ("comm @0 (early)", lambda r: r["prefix"] == "ql_SE_START")),
               hub_mu)

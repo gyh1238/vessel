@@ -134,10 +134,9 @@ def fig1(rows):
     fsx.panel_tag(ax, "(e)", dx=-0.14)
 
     fig.text(0.5, -0.035,
-             "v12mix freeze, 3 seeds. Arrival is among ended episodes. Proximity is ship-box overlap "
-             "over ended + still-open voyages (not a crash rate among finished trips).\n"
+             "v12mix freeze, PRIMARY v2-strict, 3 seeds. Arrival among ended; proximity among ended+open.\n"
              f"Typical goal-episode minSep ON {ms(on, 'minSep')[0]:.1f} m / OFF {ms(off, 'minSep')[0]:.1f} m.  "
-             "PRIMARY v2 C is near ceiling on both arms; communication wins arrival and proximity.",
+             "Select by arrival/proximity; C is diagnostic only.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig1_Communication_necessity")
 
@@ -237,75 +236,106 @@ def fig3(rows):
 
 
 def fig4(rows):
-    order = [(6, "qd_MOE_SE"), (8, "q_DIM8"), (10, "q_DIM10"), (12, "q_DIM12")]
+    # Unique trainable params (CNNPolicy with share_backbone); |m| barely moves capacity.
+    PARAM_DIM = {2: 215327, 4: 216823, 6: 218327, 8: 219839, 10: 221359, 12: 222887}
+    order = [(2, "q_DIM2"), (4, "q_DIM4"), (6, "qd_MOE_SE"),
+             (8, "q_DIM8"), (10, "q_DIM10"), (12, "q_DIM12")]
+    # Drop arms with no metrics yet.
+    order = [(d, p) for d, p in order if pick(rows, p)]
     d = [x[0] for x in order]
     goal = [ms(pick(rows, p), "goal")[0] for _, p in order]
     prox = [ms(pick(rows, p), "prox")[0] for _, p in order]
-    sco = [score_row(r) for _, p in order for r in [ {**{"goal": ms(pick(rows, p), "goal")[0],
-                                                         "prox": ms(pick(rows, p), "prox")[0],
-                                                         "TO": 0.0}} ]]
+    params = [PARAM_DIM.get(xi, float("nan")) / 1e3 for xi in d]
 
-    panels = [("(a)", goal, "Arrival rate (%)", "Arrival rate", False),
-              ("(b)", prox, "Proximity rate (%)", "Proximity rate", True),
-              ("(c)", sco, "Outcome score", "Outcome score (1.5 goal - 6 prox)", False)]
+    fig = plt.figure(figsize=(11.0, 6.4))
+    gs = GridSpec(2, 2, figure=fig, hspace=0.42, wspace=0.30)
 
-    fig, axes = plt.subplots(1, 3, figsize=(11.0, 3.6), sharex=True)
-    for ax, (tag, y, ylab, title, lower_better) in zip(axes, panels):
-        ax.axvspan(5.5, 6.5, color=C["proposed"], alpha=0.07, lw=0, zorder=0)
-        ax.plot(d, y, marker="o", ms=5, lw=1.5, color=C["proposed"],
-                mfc="white", mec=C["proposed"], mew=1.4, zorder=3)
-        for xi, yi in zip(d, y):
-            ax.annotate(f"{yi:.1f}", (xi, yi), textcoords="offset points",
-                        xytext=(0, 7), ha="center", fontsize=7.6, color=C["ink"])
-        ax.set_ylabel(ylab)
-        ax.set_title(title)
-        lo, hi = min(y), max(y)
-        span = max(hi - lo, 0.2)
-        ax.set_ylim(lo - span * 0.30, hi + span * 0.35)
-        ax.set_xticks(d)
-        ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
-        fsx.panel_tag(ax, tag)
-        if lower_better:
-            ax.annotate("lower is better", (0.98, 0.94), xycoords="axes fraction",
-                        ha="right", fontsize=7.2, color=C["mute"])
-    fig.text(0.5, -0.08,
-             "DIM6/8/10/12 on v12mix shared MoE (soft route-mix), 3 seeds.\n"
-             "DIM6 remains the selected width: wider channels do not help.",
+    ax = fig.add_subplot(gs[0, 0])
+    ax.plot(d, goal, marker="o", ms=5, lw=1.5, color=C["proposed"],
+            mfc="white", mec=C["proposed"], mew=1.4)
+    for xi, yi in zip(d, goal):
+        ax.annotate(f"{yi:.1f}", (xi, yi), textcoords="offset points",
+                    xytext=(0, 7), ha="center", fontsize=7.6, color=C["ink"])
+    ax.set_ylabel("Arrival rate (%)")
+    ax.set_title("Arrival rate")
+    ax.set_xticks(d)
+    ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
+    fsx.panel_tag(ax, "(a)")
+
+    ax = fig.add_subplot(gs[0, 1])
+    ax.plot(d, prox, marker="o", ms=5, lw=1.5, color=C["proposed"],
+            mfc="white", mec=C["proposed"], mew=1.4)
+    for xi, yi in zip(d, prox):
+        ax.annotate(f"{yi:.2f}", (xi, yi), textcoords="offset points",
+                    xytext=(0, 7), ha="center", fontsize=7.6, color=C["ink"])
+    ax.set_ylabel("Proximity rate (%)")
+    ax.set_title("Proximity rate")
+    ax.set_xticks(d)
+    ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
+    ax.annotate("lower is better", (0.98, 0.94), xycoords="axes fraction",
+                ha="right", fontsize=7.2, color=C["mute"])
+    fsx.panel_tag(ax, "(b)")
+
+    ax = fig.add_subplot(gs[1, 0])
+    lab = [str(xi) for xi in d]
+    fsx.bars(ax, lab, params, [C["proposed"]] * len(d), "{:.0f}K",
+             ylabel="Trainable params (thousands)", title="Parameter count (unique)")
+    ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
+    fsx.panel_tag(ax, "(c)")
+
+    sco = [1.5 * g - 6.0 * p for g, p in zip(goal, prox)]
+    ax = fig.add_subplot(gs[1, 1])
+    ax.plot(d, sco, marker="o", ms=5, lw=1.5, color=C["proposed"],
+            mfc="white", mec=C["proposed"], mew=1.4)
+    for xi, yi in zip(d, sco):
+        ax.annotate(f"{yi:.1f}", (xi, yi), textcoords="offset points",
+                    xytext=(0, 7), ha="center", fontsize=7.6, color=C["ink"])
+    ax.set_ylabel("Outcome score")
+    ax.set_title("Outcome score (1.5 goal - 6 prox)")
+    ax.set_xticks(d)
+    ax.set_xlabel(r"Message dimension  $|\mathbf{m}|$")
+    fsx.panel_tag(ax, "(d)")
+
+    fig.text(0.5, -0.02,
+             "v12mix shared MoE, 3 seeds. Param count barely moves with |m| (panel c) — "
+             "wider is not 'more capacity' like THICK.\n"
+             "DIM2/4 test whether the channel is too narrow; DIM≥6 tests redundancy.",
              ha="center", fontsize=8.0, color=C["mute"])
-    fig.tight_layout()
     fsx.save(fig, str(OUT), "Fig4_Message_dimensionality")
 
 
 def fig5(rows):
-    off, on = pick(rows, "qo_SE_COLREGSOFF"), pick(rows, "qd_MOE_SE")
-    lab = ["COLREGs term\nOFF", "COLREGs term\nON"]
+    late, early = pick(rows, "qo_SE_COLREGS_LATE"), pick(rows, "qd_MOE_SE")
+    lab = ["Late ramp\n(0→0.45 @9M)", "Early\n(0.45 from start)"]
     col = [C["base"], C["proposed"]]
     fig = plt.figure(figsize=(11.0, 3.9))
-    gs = GridSpec(1, 3, figure=fig, width_ratios=[1.45, 1.0, 1.0], wspace=0.30)
+    gs = GridSpec(1, 3, figure=fig, wspace=0.30)
 
+    p_l, p_e = ms(late, "prox"), ms(early, "prox")
     ax = fig.add_subplot(gs[0, 0])
-    sch.colregs_penalty(ax)
-    ax.set_title("Directional non-compliance penalty", pad=4)
-    fsx.panel_tag(ax, "(a)", dx=-0.02)
-
-    p_off, p_on = ms(off, "prox"), ms(on, "prox")
-    ax = fig.add_subplot(gs[0, 1])
-    fsx.bars(ax, lab, [p_off[0], p_on[0]], col, "{:.2f}",
+    fsx.bars(ax, lab, [p_l[0], p_e[0]], col, "{:.2f}",
              ylabel="Proximity rate (%)", title="Proximity rate")
-    ax.tick_params(axis="x", labelsize=8.2)
-    fsx.panel_tag(ax, "(b)")
+    ax.tick_params(axis="x", labelsize=8.0)
+    fsx.panel_tag(ax, "(a)", dx=-0.14)
 
-    c_off, c_on = ms(off, "C_v2"), ms(on, "C_v2")
+    g_l, g_e = ms(late, "goal"), ms(early, "goal")
+    ax = fig.add_subplot(gs[0, 1])
+    fsx.bars(ax, lab, [g_l[0], g_e[0]], col, "{:.1f}",
+             ylabel="Arrival rate (%)", title="Arrival rate")
+    ax.tick_params(axis="x", labelsize=8.0)
+    fsx.panel_tag(ax, "(b)", dx=-0.14)
+
+    c_l, c_e = ms(late, "C_v2"), ms(early, "C_v2")
     ax = fig.add_subplot(gs[0, 2])
-    fsx.bars(ax, lab, [c_off[0], c_on[0]], col, "{:.1f}",
-             ylabel="Compliance (%)", title="Overall COLREGs (PRIMARY v2)")
-    ax.tick_params(axis="x", labelsize=8.2)
-    fsx.panel_tag(ax, "(c)")
+    fsx.bars(ax, lab, [c_l[0], c_e[0]], col, "{:.1f}",
+             ylabel="Compliance (%)", title="COLREGs (PRIMARY v2-strict)")
+    ax.tick_params(axis="x", labelsize=8.0)
+    fsx.panel_tag(ax, "(c)", dx=-0.14)
 
     fig.text(0.5, -0.10,
-             "v12mix, 3 seeds. The COLREGs term raises PRIMARY v2 C and is the only ablation that "
-             "moves C off the ceiling.\n"
-             "Arrival and proximity stay similar; use C for this axis, not proximity alone.",
+             "v12mix, 3 seeds. Same final coef 0.45; only the turn-on time differs "
+             "(0 until 9M vs from start).\n"
+             "Not a term-OFF ablation — that made C collapse and was not the intended axis.",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig5_COLREGs_shaping")
 
@@ -395,7 +425,7 @@ def fig7(_rows):
     fsx.panel_tag(ax, "(a)", dx=-0.02)
 
     spec = [("(b)", "coll", "Proximity rate (%)", "Proximity rate", gs[0, 1]),
-            ("(c)", "colregs", "Compliance (%)", "COLREGs (step-legacy)", gs[1, 0]),
+            ("(c)", "goal", "Arrival rate (%)", "Arrival rate", gs[1, 0]),
             ("(d)", "minsep", "Minimum separation (m)", "Minimum separation", gs[1, 1])]
     for tag, col, ylab, title, cell in spec:
         ax = fig.add_subplot(cell)
@@ -416,10 +446,10 @@ def fig7(_rows):
         sec.set_xlabel("Tx-capable vessels", fontsize=8.0, labelpad=2)
 
     fig.text(0.5, -0.035,
-             f"v12mix hub mixed-fleet CSV, {len(seeds)} seeds, sample-weighted fleet. "
-             "Panel (b) is the CSV proximity/overlap rate (not PRIMARY v2). "
-             "Panel (c) is still step-legacy C.\n"
-             "Grey dots are individual seeds.",
+             f"v12mix hub, mute-TX (rx-only) sweep, {len(seeds)} seeds, sample-weighted fleet.\n"
+             "Claim: cutting transmitters does not collapse the fleet while receivers still hear. "
+             "Not the same as Fig1 Comm OFF (all messages zeroed).\n"
+             "Step-legacy COLREGs panel removed (was ~63% and not PRIMARY).",
              ha="center", fontsize=8.0, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig7_Heterogeneous_fleet")
 

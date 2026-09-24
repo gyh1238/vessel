@@ -109,14 +109,25 @@ switch ($Fig) {
     }
   }
   "fig5" {
-    Add-Seeds "qo_SE_COLREGSOFF" "ON" @{ VESSEL_SIM_COLREGS_COEF = "0" } $CommOnAt
+    # 계수 스윕. 0 = 항 없음(기존 태그). 0.45 = hub(재학습하지 않음).
+    $coef = if ($Arm -match '^[0-9.]+$') { [double]$Arm } else { $null }
+    if ($null -eq $coef) {
+      Add-Seeds "qo_SE_COLREGSOFF" "ON" @{ VESSEL_SIM_COLREGS_COEF = "0" } $CommOnAt
+    } elseif ([math]::Abs($coef - 0.0) -lt 1e-9) {
+      Add-Seeds "qo_SE_COLREGSOFF" "ON" @{ VESSEL_SIM_COLREGS_COEF = "0" } $CommOnAt
+    } elseif ([math]::Abs($coef - 0.45) -lt 1e-9) {
+      Write-Host "coef 0.45 = hub (qd_MOE_SE). Use -Fig hub."
+    } else {
+      $tag = ("qo_SE_C{0}" -f ($coef.ToString("0.00", [System.Globalization.CultureInfo]::InvariantCulture) -replace '\.', 'p'))
+      Add-Seeds $tag "ON" @{ VESSEL_SIM_COLREGS_COEF = "$coef" } $CommOnAt
+    }
   }
   "fig6" {
     Add-Seeds "ql_SE_START" "ON" $empty 0
   }
 }
 
-if ($Arm -and $Fig -notin @("fig2", "fig4")) {
+if ($Arm -and $Fig -notin @("fig2", "fig4", "fig5")) {
   $specs = [System.Collections.Generic.List[object]]@($specs | Where-Object { $_.Tag -match [regex]::Escape($Arm) })
 }
 

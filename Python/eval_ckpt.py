@@ -210,16 +210,16 @@ def main():
     #   v11 (병기): GW = 우현 오프셋≥10° OR 감속≥15%. SO = max|목표오프셋|≤25°.
     #     문제: 무조우 배의 |오프셋| 중앙~39°라 SO가 배경 항해에 걸려 ~6%로 붕괴 (C~55%의 원인).
     #     IMO는 각도를 안 박음. 근거: runs/paper/results/COLREGS_EVAL.md
-    #   v2 (기본, colregsOK): GW = 우현 오프셋≥10° OR 우현 Δψ≥10° OR 감속≥15% (Rule 8 course OR speed).
-    #     SO = 같은길이 무조우 창 |Δψ|의 P75 이하(배경 대비 유지) OR 최근접<CLOSE(Rule 17b 허용).
+    #   v2-strict (기본, colregsOK): GW = 우현 오프셋≥15° OR 우현 Δψ≥15° OR 감속≥20%.
+    #     SO = 같은길이 무조우 창 |Δψ|의 P60 이하 OR 최근접<CLOSE(Rule 17b 허용).
     #     주지표는 전 쌍. VESSEL_EVAL_PRIMARY_DOMINANT=1 이면 최고위험 쌍만(파일럿에서 C 포화).
     #   VESSEL_EVAL_PRIMARY_MODE=v11 이면 주지표를 옛 정의로(과거 숫자 재현).
-    PRIMARY_OFF_DEG = float(os.environ.get('VESSEL_EVAL_PRIMARY_OFF_DEG', '10'))
-    PRIMARY_SPD_DROP = float(os.environ.get('VESSEL_EVAL_PRIMARY_SPD_DROP', '0.15'))
+    PRIMARY_OFF_DEG = float(os.environ.get('VESSEL_EVAL_PRIMARY_OFF_DEG', '15'))
+    PRIMARY_SPD_DROP = float(os.environ.get('VESSEL_EVAL_PRIMARY_SPD_DROP', '0.20'))
     PRIMARY_SO_OFF_DEG = float(os.environ.get('VESSEL_EVAL_PRIMARY_SO_OFF_DEG', '25'))
     PRIMARY_SO_DPSI = float(os.environ.get('VESSEL_EVAL_PRIMARY_SO_DPSI', '30'))  # v11 print leftover; v2 fallback
     PRIMARY_MODE = os.environ.get('VESSEL_EVAL_PRIMARY_MODE', 'v2').strip().lower()
-    PRIMARY_SO_NULL_Q = float(os.environ.get('VESSEL_EVAL_SO_NULL_Q', '75'))
+    PRIMARY_SO_NULL_Q = float(os.environ.get('VESSEL_EVAL_SO_NULL_Q', '60'))
     PRIMARY_SO_CLOSE_M = float(os.environ.get('VESSEL_EVAL_SO_CLOSE_M', f'{4.0 * vg.SHIP_HALF_LEN:.4f}'))
     PRIMARY_DOMINANT = os.environ.get('VESSEL_EVAL_PRIMARY_DOMINANT', '0') == '1'
     pri_ok = {k: 0 for k in (1, 2, 3, 4)}

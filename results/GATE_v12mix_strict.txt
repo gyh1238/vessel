@@ -1,0 +1,8 @@
+PRIMARY v2-strict re-eval (OFF_DEG=15 SPD=0.20 SO_NULL_Q=60)
+
+strict_qd_MOE_SE_MX: n=3 goal=95.7 C_dom=96.2
+strict_q_MOE_SINGLE_MX: n=3 goal=95.6 C_dom=94.7
+strict_qf_SE_OFF_MX: n=3 goal=92.7 C_dom=95.5
+strict_qo_SE_COLREGS_LATE_MX: n=3 goal=96.4 C_dom=90.9
+strict_q_DIM2_MX: n=3 goal=84.1 C_dom=94.8
+strict_q_DIM4_MX: n=3 goal=93.0 C_dom=96.1
