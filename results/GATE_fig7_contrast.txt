@@ -1,0 +1,4 @@
+﻿Fig7 contrast experiments (2026-09-25)
+- radar vs rx (same ON): NO SEPARATION (both ~95% flat)
+- OFF-trained mute-TX vs ON mute-TX: SEPARATES (~93 vs ~95), both flat vs n_rx
+Claim revised: sparse TX does not collapse fleet; training-with-comm level persists.

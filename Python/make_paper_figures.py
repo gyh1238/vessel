@@ -375,9 +375,11 @@ def fig6(rows):
     fsx.save(fig, str(OUT), "Fig6_Communication_timing")
 
 
-def _load_mixed():
-    path = PAPER / "v12mix_hub" / "fig7" / "mixed_fleet_rx.csv"
-    if not path.exists():
+def _load_mixed(name="rx"):
+    """Load mixed-fleet CSV. name: rx | radar | off_rx.
+    Tags may be s42 or off_s42 — normalized to s42 for joining seeds."""
+    path = PAPER / "v12mix_hub" / "fig7" / f"mixed_fleet_{name}.csv"
+    if name == "rx" and not path.exists():
         path = PAPER / "fig7" / "mixed_fleet_rx.csv"
     if not path.exists():
         return None
@@ -387,7 +389,10 @@ def _load_mixed():
             d = {k: float(v) for k, v in r.items()
                  if k not in ("tag", "mode", "nocomm", "group")}
             d["goal_eps"] = d["eps"] * d["goal"] / 100.0
-            by.setdefault((int(float(r["nocomm"])), r["tag"]), {})[r["group"]] = d
+            tag = r["tag"]
+            if tag.startswith("off_"):
+                tag = tag[4:]  # off_s42 -> s42
+            by.setdefault((int(float(r["nocomm"])), tag), {})[r["group"]] = d
     return by
 
 
@@ -395,12 +400,15 @@ def fig7(_rows):
     WEIGHT = {"goal": "eps", "coll": "eps", "to": "eps", "minsep": "eps",
               "colregs": "colregs_n", "fuel": "goal_eps", "head": "goal_eps",
               "length": "goal_eps"}
-    by = _load_mixed()
-    if by is None:
+    by_on = _load_mixed("rx")
+    if by_on is None:
         print("  Fig7 skipped - mixed_fleet_rx.csv missing")
         return
-    ks = sorted({k for k, _ in by})
-    seeds = sorted({t for _, t in by})
+    # Prefer OFF-trained mute-TX contrast (radar mute did not separate on this hub).
+    by_off = _load_mixed("off_rx")
+    by_radar = None if by_off is not None else _load_mixed("radar")
+    ks = sorted({k for k, _ in by_on})
+    seeds = sorted({t for _, t in by_on})
 
     def fleet(groups, col):
         w = WEIGHT.get(col, "eps")
@@ -408,11 +416,11 @@ def fig7(_rows):
         den = sum(g[w] for g in groups.values() if g.get(w, 0) > 0)
         return num / den if den > 0 else float("nan")
 
-    def series(col):
+    def series(by, col):
         mean, sd, dots = [], [], []
         for k in ks:
             vals = [fleet(by[(k, t)], col) for t in seeds if (k, t) in by]
-            mean.append(float(np.mean(vals)))
+            mean.append(float(np.mean(vals)) if vals else float("nan"))
             sd.append(float(np.std(vals, ddof=1)) if len(vals) > 1 else 0.0)
             dots.append(vals)
         return np.array(mean), np.array(sd), dots
@@ -424,35 +432,72 @@ def fig7(_rows):
     ax.set_title("Fleet composition", pad=4)
     fsx.panel_tag(ax, "(a)", dx=-0.02)
 
+    contrast = by_off if by_off is not None else by_radar
+    if by_off is not None:
+        xlab = "Rx-only vessels (of 16)"
+        top_lab = "Tx-capable vessels"
+        main_lab, alt_lab = "ON policy (trained w/ comm)", "OFF policy (trained w/o)"
+        alt_color = C["base"]
+    elif by_radar is not None:
+        xlab = "Impaired vessels (of 16)"
+        top_lab = "Still fully capable"
+        main_lab, alt_lab = "Rx-only (hears)", "Radar-only (deaf)"
+        alt_color = C["base"]
+    else:
+        xlab = "Rx-only vessels (of 16)"
+        top_lab = "Tx-capable vessels"
+        main_lab, alt_lab, alt_color = None, None, None
+
     spec = [("(b)", "coll", "Proximity rate (%)", "Proximity rate", gs[0, 1]),
             ("(c)", "goal", "Arrival rate (%)", "Arrival rate", gs[1, 0]),
             ("(d)", "minsep", "Minimum separation (m)", "Minimum separation", gs[1, 1])]
     for tag, col, ylab, title, cell in spec:
         ax = fig.add_subplot(cell)
-        m, s, dots = series(col)
+        m, s, dots = series(by_on, col)
         ax.plot(ks, m, marker="o", ms=4.5, lw=1.5, color=C["proposed"],
-                mfc="white", mec=C["proposed"], mew=1.3, zorder=3)
+                mfc="white", mec=C["proposed"], mew=1.3, zorder=3,
+                label=main_lab or "ON hub")
         for k, ds in zip(ks, dots):
             ax.plot([k] * len(ds), ds, marker=".", ls="none", ms=3.4,
                     color=C["mute"], alpha=0.75, zorder=2)
+        if contrast is not None:
+            mr, sr, dots_r = series(contrast, col)
+            ax.plot(ks, mr, marker="s", ms=4.0, lw=1.5, color=alt_color,
+                    mfc="white", mec=alt_color, mew=1.3, zorder=3,
+                    label=alt_lab)
+            for k, ds in zip(ks, dots_r):
+                ax.plot([k] * len(ds), ds, marker=".", ls="none", ms=3.0,
+                        color=alt_color, alpha=0.45, zorder=2)
+            if tag == "(c)":
+                ax.legend(frameon=False, fontsize=7.2, loc="best")
         ax.set_xticks(ks)
-        ax.set_xlabel("Rx-only vessels (of 16)")
+        ax.set_xlabel(xlab)
         ax.set_ylabel(ylab)
         ax.set_title(title, pad=30)
         fsx.panel_tag(ax, tag, dy=1.20)
         sec = ax.secondary_xaxis("top")
         sec.set_xticks(ks)
         sec.set_xticklabels([str(16 - k) for k in ks], fontsize=7.6)
-        sec.set_xlabel("Tx-capable vessels", fontsize=8.0, labelpad=2)
+        sec.set_xlabel(top_lab, fontsize=8.0, labelpad=2)
 
-    fig.text(0.5, -0.035,
-             f"v12mix hub, mute-TX (rx-only) sweep, {len(seeds)} seeds, sample-weighted fleet.\n"
-             "Each n_rx is an isolated eval (64 envs) matching Fig1 budget — "
-             "n_rx=0 anchors to Fig1 ON (~95%).\n"
-             "Claim: cutting transmitters does not collapse the fleet while receivers still hear. "
-             "n_rx=16 is test-time message ablation on the ON policy (not Fig1 OFF-trained).\n"
-             "Step-legacy COLREGs panel removed (was ~63% and not PRIMARY).",
-             ha="center", fontsize=7.6, color=C["mute"])
+    if by_off is not None:
+        cap = (
+            f"Same mute-TX (rx-only) sweep, isolated 64-env eval, {len(seeds)} seeds.\n"
+            "ON hub stays near Fig1 ON (~95%); OFF-trained stays near Fig1 OFF (~93%). "
+            "Cutting transmitters does not erase the training-with-comm advantage, and neither curve collapses.\n"
+            "Radar-only mute (hear nothing) did not separate from rx-only on this hub — omitted."
+        )
+    elif by_radar is not None:
+        cap = (
+            f"v12mix hub, same ON policy, {len(seeds)} seeds, isolated 64-env eval (Fig1 budget).\n"
+            "Rx-only = mute TX but still receive; Radar-only = no TX and no RX."
+        )
+    else:
+        cap = (
+            f"v12mix hub, mute-TX (rx-only) sweep, {len(seeds)} seeds.\n"
+            "n_rx=0 anchors to Fig1 ON (~95%)."
+        )
+    fig.text(0.5, -0.035, cap, ha="center", fontsize=7.6, color=C["mute"])
     fsx.save(fig, str(OUT), "Fig7_Heterogeneous_fleet")
 
 

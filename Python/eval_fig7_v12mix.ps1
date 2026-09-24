@@ -22,8 +22,9 @@ $Paper = Join-Path (Split-Path $Root -Parent) "runs\paper"
 $Hub = Join-Path $Paper "v12mix_hub"
 $Out = Join-Path $Hub "fig7"
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
-$csv = Join-Path $Out "mixed_fleet_rx.csv"
-$ep = Join-Path $Out "mixed_fleet_rx_episodes.csv"
+$tag = if ($Mode -eq "radar") { "radar" } else { "rx" }
+$csv = Join-Path $Out "mixed_fleet_$tag.csv"
+$ep = Join-Path $Out "mixed_fleet_${tag}_episodes.csv"
 $Status = Join-Path $Hub "STATUS.txt"
 $Ks = @($Sweep.Split(',') | ForEach-Object { [int]$_.Trim() } | Where-Object { $_ -ge 0 })
 
@@ -48,7 +49,7 @@ function Set-Fig7Freeze {
 Write-Status "Fig7 v12mix hub start mode=$Mode sweep=$Sweep envs_per=$EnvsPer gpus=$($Gpus -join ',') isolated-k=1"
 $ts = Get-Date -Format "yyyyMMdd_HHmmss"
 if (Test-Path $csv) {
-  Copy-Item $csv (Join-Path $Out "mixed_fleet_rx.prev_$ts.csv")
+  Copy-Item $csv (Join-Path $Out "mixed_fleet_${tag}.prev_$ts.csv")
   Remove-Item $csv -EA SilentlyContinue
 }
 Remove-Item $ep -EA SilentlyContinue
@@ -60,11 +61,11 @@ foreach ($s in $Seeds) {
   $ckpt = Join-Path $Hub "qd_MOE_SE_MX_s$s.pt"
   if (-not (Test-Path $ckpt)) { throw "missing $ckpt" }
   $gpu = $Gpus[$gi % $Gpus.Count]; $gi++
-  $seedCsv = Join-Path $Out "mixed_fleet_rx_s$s.csv"
-  $seedEp = Join-Path $Out "mixed_fleet_rx_s${s}_episodes.csv"
-  $log = Join-Path $Out "rerun_iso_s$s.log"
+  $seedCsv = Join-Path $Out "mixed_fleet_${tag}_s$s.csv"
+  $seedEp = Join-Path $Out "mixed_fleet_${tag}_s${s}_episodes.csv"
+  $log = Join-Path $Out "rerun_iso_${tag}_s$s.log"
   Remove-Item $seedCsv, $seedEp, $log -EA SilentlyContinue
-  $script = Join-Path $Out "_iso_seed_s$s.ps1"
+  $script = Join-Path $Out "_iso_seed_${tag}_s$s.ps1"
   $kList = ($Ks -join ',')
   @"
 `$ErrorActionPreference = 'Stop'
@@ -77,12 +78,12 @@ Set-PaperFreezeEnv -Override @{
   VESSEL_EVAL_APPLY_SNAPSHOT='1'
 }
 foreach (`$k in @($kList)) {
-  Write-Host ("Fig7 s$s k=`$k gpu=$gpu")
+  Write-Host ("Fig7 $Mode s$s k=`$k gpu=$gpu")
   & '$Py' -u eval_mixed.py --ckpt '$ckpt' --mode '$Mode' --tag 's$s' --sweep ("{0}" -f `$k) --envs_per $EnvsPer --burnin $Burnin --eval_decisions $EvalDecisions --ring 0.7 --max_partners 4 --csv '$seedCsv' --ep_csv '$seedEp'
-  if (`$LASTEXITCODE -ne 0) { throw "Fig7 s$s k=`$k exit=`$LASTEXITCODE" }
+  if (`$LASTEXITCODE -ne 0) { throw "Fig7 $Mode s$s k=`$k exit=`$LASTEXITCODE" }
 }
 "@ | Set-Content $script -Encoding UTF8
-  Write-Status "launch seed=$s gpu=$gpu"
+  Write-Status "launch mode=$Mode seed=$s gpu=$gpu"
   $seedJobs += Start-Process -FilePath "powershell.exe" -ArgumentList @(
     "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $script
   ) -PassThru -WindowStyle Hidden -RedirectStandardOutput $log -RedirectStandardError "$log.err"
@@ -90,7 +91,6 @@ foreach (`$k in @($kList)) {
 
 while ($seedJobs | Where-Object { -not $_.HasExited }) { Start-Sleep -Seconds 30 }
 foreach ($j in $seedJobs) {
-  # Start-Process ExitCode can stay $null briefly on Windows even after HasExited.
   if (-not $j.HasExited) { throw "Fig7 seed worker pid=$($j.Id) still running" }
   if ($null -ne $j.ExitCode -and $j.ExitCode -ne 0) {
     throw "Fig7 seed worker pid=$($j.Id) exit=$($j.ExitCode)"
@@ -100,18 +100,21 @@ foreach ($j in $seedJobs) {
 # Merge
 $header = $null
 foreach ($s in $Seeds) {
-  $seedCsv = Join-Path $Out "mixed_fleet_rx_s$s.csv"
+  $seedCsv = Join-Path $Out "mixed_fleet_${tag}_s$s.csv"
   if (-not (Test-Path $seedCsv)) { throw "missing $seedCsv" }
   $lines = Get-Content $seedCsv
   if ($null -eq $header) { $header = $lines[0]; Set-Content $csv $header }
   $lines | Select-Object -Skip 1 | Add-Content $csv
-  $seedEp = Join-Path $Out "mixed_fleet_rx_s${s}_episodes.csv"
+  $seedEp = Join-Path $Out "mixed_fleet_${tag}_s${s}_episodes.csv"
   if (Test-Path $seedEp) {
     $el = Get-Content $seedEp
     if (-not (Test-Path $ep)) { Set-Content $ep $el[0] }
     $el | Select-Object -Skip 1 | Add-Content $ep
   }
 }
-Copy-Item $csv (Join-Path $Paper "fig7\mixed_fleet_rx.csv") -Force
+# Tracked paper copy: keep rx name for figure loader; radar stays under hub/fig7 only.
+if ($tag -eq "rx") {
+  Copy-Item $csv (Join-Path $Paper "fig7\mixed_fleet_rx.csv") -Force
+}
 Write-Status "Fig7 CSV $csv"
-Write-Status "Fig7 v12mix hub complete"
+Write-Status "Fig7 v12mix hub complete mode=$Mode"

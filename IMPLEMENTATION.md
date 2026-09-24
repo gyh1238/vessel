@@ -216,13 +216,13 @@ THIN은 단일망과 파라미터를 맞춰 **전문화 vs 용량**을 분리한
 ### Fig7 혼합함대 (학습 없음)
 
 - 스크립트: `eval_fig7_v12mix.ps1` → `eval_mixed.py`
-- 정책: hub ×3 시드
-- n_rx ∈ {0,2,…,16}. 그 척은 **송신 불가, 수신은 가능** (mode=rx)
-- **프로토콜 (2026-09-24):** k마다 **독립** 평가, `envs_per=64` (Fig1과 동일 예산).  
-  예전 배치 스윕(`envs_per=7`, 한 VesselBatchEnv에 여러 k)은 n_rx=0 앵커가 깨지고 도착이 Rx↑에 따라 올라가는 가짜 곡선을 만들어 폐기.
-- 산출: `runs/paper/v12mix_hub/fig7/mixed_fleet_rx.csv` (+ tracked copy `runs/paper/fig7/`)
-- 그림 패널: prox / goal / minSep. step-legacy C는 쓰지 않음.
-- n_rx=16 = ON ckpt + 송신 전부 mute (테스트타임 차단). Fig1 OFF 학습 ckpt와 동일시하지 않음.
+- **주 곡선:** hub ON ×3 시드, mute-TX (mode=rx), n_rx ∈ {0,2,…,16}
+- **대조 곡선:** `qf_SE_OFF_MX` ×3 (통신 없이 학습), **같은** mute-TX 스윕  
+  → 산출 `mixed_fleet_off_rx.csv`
+- **시도·폐기:** 같은 ON에서 mode=radar vs rx — fleet goal이 안 갈림 (`mixed_fleet_radar.csv` 보관만)
+- **프로토콜:** k마다 독립, `envs_per=64` (Fig1 예산). 옛 배치 envs_per=7 폐기.
+- 그림: ON vs OFF mute-TX (prox/goal/minSep). step-legacy C 미사용.
+
 
 ### Fig8 전역경로 (학습 없음)
 

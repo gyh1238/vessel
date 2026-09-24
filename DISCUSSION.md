@@ -131,9 +131,9 @@ DIM2/4 ≪ DIM6. DIM≥6에서 평탄·소폭 악화 → **6이 충분.**
 
 ![Fig7](figures/Fig7_Heterogeneous_fleet.png)
 
-hub 고정, n_rx=0…16이 **송신만 못 함(수신 OK)**. k마다 Fig1과 같은 64-env 평가.  
-n_rx=0 도착 **95.3** ≈ Fig1 ON; 전 구간 ~94–96%로 급락 없음.  
-n_rx=16은 ON 정책 메시지 차단(≠ Fig1 OFF 학습 ckpt). C 패널은 본문에서 빼 둠.
+같은 mute-TX 스윕, **ON 학습 vs OFF 학습** 정책.  
+ON ~95% 평탄, OFF ~93% 평탄 — 송신 희소해도 붕괴 없고, Fig1 ON/OFF 레벨이 유지됨.  
+(같은 ON에서 radar vs rx는 이 hub에서 안 갈려 폐기.)
 
 ---
 
